@@ -1,111 +1,192 @@
+/* ------------------------------------------------------------------
+   DESIGN TOKENS — tema "Atlas" (azul profundo + dourado)
+   Pensado como uma sala de operações de investimentos à noite:
+   fundo quase-preto azulado, painéis em vidro fosco, e um dourado
+   sóbrio reservado só para o que realmente importa (destaques,
+   números principais, estado ativo da navegação).
+   Se quiser trocar uma cor do projeto inteiro, troque só aqui.
+------------------------------------------------------------------- */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Fundo: camadas de azul-marinho quase preto, criando profundidade */
+  --bg-base: #070c14;
+  --bg-elevated: #0d1826;
+  --bg-surface: #101d2f;
+  --bg-surface-hover: #16263b;
+  --border-subtle: rgba(148, 163, 184, 0.12);
+  --border-strong: rgba(148, 163, 184, 0.22);
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Dourado — a cor de assinatura do produto. Usar com moderação. */
+  --gold-400: #e8c874;
+  --gold-500: #d4af37;
+  --gold-600: #b3901f;
+  --gold-glow: rgba(212, 175, 55, 0.25);
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Ciano — apoio secundário (links, ícones informativos) */
+  --cyan-400: #5fd4e0;
+  --cyan-500: #22b8c9;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* Texto */
+  --text-primary: #eef2f7;
+  --text-secondary: #97a3b6;
+  --text-muted: #5f6b80;
+
+  /* Verde / vermelho ajustados para bom contraste em fundo escuro */
+  --green-400: #3ddc84;
+  --green-bg: rgba(61, 220, 132, 0.12);
+  --red-400: #ff6b6b;
+  --red-bg: rgba(255, 107, 107, 0.12);
+
+  /* Espaçamento e forma */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 20px 40px rgba(0, 0, 0, 0.35);
+  --shadow-gold: 0 8px 24px var(--gold-glow);
+
+  /* Tipografia: Sora para títulos/números (geométrica, confiante),
+     Inter para texto corrido (alta legibilidade em telas pequenas) */
+  --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+
+  font-family: var(--font-body);
+  color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+* {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
   margin: 0;
+  background: var(--bg-base);
+  background-image: radial-gradient(circle at 15% 0%, rgba(212, 175, 55, 0.06), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(34, 184, 201, 0.05), transparent 40%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
+h2,
+h3,
 p {
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+button {
+  font-family: inherit;
 }
+
+/* Foco visível no teclado (acessibilidade) */
+:focus-visible {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 2px;
+}
+
+/* Barra de rolagem discreta, combinando com o tema escuro */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface-hover);
+  border-radius: 999px;
+}
+
+/* Respeita quem prefere menos animação */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:root {
+  /* Cores base (tema escuro refinado) */
+  --bg-base: #0b1119;
+  --bg-surface: #141c26;
+  --bg-elevated: #1c2736;
+  --bg-surface-hover: #253344;
+  
+  --border-subtle: #2a3a4a;
+  --border-strong: #3c4f62;
+  
+  --text-primary: #eef4f8;
+  --text-secondary: #9bb0c4;
+  --text-muted: #6a7f92;
+  
+  --gold-400: #d4af37;
+  --gold-500: #c9a02a;
+  --gold-600: #b58d1e;
+  --gold-glow: rgba(212, 175, 55, 0.3);
+  
+  --red-400: #e45c5c;
+  
+  --font-display: 'Inter', sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow-gold: 0 4px 20px rgba(212, 175, 55, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scroll suave global */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Estilo da scrollbar (opcional) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-500);
+}
+

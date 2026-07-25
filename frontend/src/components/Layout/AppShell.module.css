@@ -1,0 +1,21 @@
+.shell {
+  display: flex;
+  min-height: 100%;
+}
+
+.mainColumn {
+  flex: 1;
+  min-width: 0;
+}
+
+.content {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+}
+
+@media (min-width: 960px) {
+  .content {
+    padding: 40px 40px 70px;
+  }
+}
