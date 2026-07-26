@@ -7,6 +7,7 @@ import pageStyles from "./Page.module.css";
 import previewStyles from "./ReportsPreview.module.css";
 import { ExportButtons } from "../components/ExportButtons/ExportButtons";
 import { Reveal } from "../components/Reveal/Reveal";
+import { PageHeader } from "../components/PageHeader/PageHeader";
 import { useWalletContext } from "../components/Layout/AppShell";
 
 function formatCurrency(value: number): string {
@@ -26,18 +27,13 @@ export function ReportsPage() {
 
   return (
     <div>
-      <div className={pageStyles.pageHeader}>
-        <div className={pageStyles.pageTitle}>Relatórios</div>
-        <div className={pageStyles.pageSubtitle}>
-          Baixe o resumo da sua carteira em PDF, Excel ou CSV
-        </div>
-      </div>
+      <PageHeader title="Relatórios" subtitle="Baixe o resumo da sua carteira em PDF, Excel ou CSV" />
 
-      <Reveal>
+      <Reveal delay={0}>
         <ExportButtons stocks={stocks} />
       </Reveal>
 
-      <Reveal delay={0.05} className={pageStyles.sectionGap}>
+      <Reveal delay={0.12} className={pageStyles.sectionGap}>
         <div className={previewStyles.previewCard}>
           <div className={previewStyles.previewHeader}>Pré-visualização</div>
           <div className={previewStyles.previewHint}>

@@ -1,0 +1,95 @@
+/* Re-tema o react-day-picker (que vem com o "style.css" padrão da
+   biblioteca) para combinar com o tema escuro/dourado do AtlasCapital.
+   Como o rdp já expõe tudo via variáveis CSS, a maior parte do
+   trabalho aqui é só apontar essas variáveis para os nossos tokens
+   (ver src/index.css). */
+
+.rdp-root {
+  --rdp-accent-color: var(--gold-500);
+  --rdp-accent-background-color: var(--gold-glow);
+  --rdp-day-height: 38px;
+  --rdp-day-width: 38px;
+  --rdp-day_button-height: 36px;
+  --rdp-day_button-width: 36px;
+  --rdp-day_button-border-radius: 10px;
+  --rdp-selected-border: 1px solid var(--gold-500);
+  --rdp-today-color: var(--gold-400);
+  --rdp-nav_button-height: 32px;
+  --rdp-nav_button-width: 32px;
+  --rdp-disabled-opacity: 0.35;
+  --rdp-outside-opacity: 0.4;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  width: 100%;
+}
+
+.rdp-months {
+  width: 100%;
+}
+
+.rdp-month {
+  width: 100%;
+}
+
+.rdp-month_grid {
+  width: 100%;
+}
+
+.rdp-weekday {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rdp-day_button {
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.rdp-day_button:hover:not([disabled]) {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.rdp-selected .rdp-day_button {
+  background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+  color: #1a1404;
+  font-weight: 700;
+}
+
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  border: 1px solid var(--gold-500);
+  color: var(--gold-400);
+}
+
+.rdp-caption_label {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.rdp-button_previous,
+.rdp-button_next {
+  color: var(--text-secondary);
+  border-radius: 8px;
+}
+
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--gold-400);
+}
+
+.rdp-dropdown {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
+.rdp-chevron {
+  fill: var(--text-secondary);
+}

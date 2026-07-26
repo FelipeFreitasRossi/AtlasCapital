@@ -2,10 +2,17 @@
 // uma ação nova quanto para EDITAR uma que já existe. Sabemos qual dos
 // dois casos estamos vivendo pela prop "initialData": se ela vier
 // preenchida, estamos editando; se vier vazia, estamos criando.
+//
+// A validação é feita com react-hook-form + zod (veja
+// "stockFormSchema.ts"): o zod descreve as regras, o react-hook-form
+// cuida do estado dos campos e mostra os erros automaticamente.
 
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import styles from "./StockForm.module.css";
+import { stockFormSchema } from "./stockFormSchema";
+import type { StockFormValues } from "./stockFormSchema";
+import { DatePicker } from "../DatePicker/DatePicker";
 import type { StockInput, StockWithMetrics } from "../../types/stock";
 
 interface StockFormProps {
@@ -14,21 +21,7 @@ interface StockFormProps {
   onSubmit: (data: StockInput) => Promise<void>;
 }
 
-// Formato dos campos enquanto o usuário está digitando (tudo texto,
-// porque é assim que um <input> funciona). Só convertemos para
-// número/data na hora de enviar.
-interface FormState {
-  ticker: string;
-  name: string;
-  quantity: string;
-  buyPrice: string;
-  currentPrice: string;
-  purchaseDate: string;
-}
-
-type FormErrors = Partial<Record<keyof FormState, string>>;
-
-function toFormState(stock: StockWithMetrics | null): FormState {
+function toFormValues(stock: StockWithMetrics | null): StockFormValues {
   if (!stock) {
     return { ticker: "", name: "", quantity: "", buyPrice: "", currentPrice: "", purchaseDate: "" };
   }
@@ -43,58 +36,28 @@ function toFormState(stock: StockWithMetrics | null): FormState {
 }
 
 export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
-  const [form, setForm] = useState<FormState>(toFormState(initialData));
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const isEditing = initialData !== null;
 
-  function handleChange(field: keyof FormState, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<StockFormValues>({
+    resolver: zodResolver(stockFormSchema),
+    defaultValues: toFormValues(initialData),
+    mode: "onBlur",
+  });
 
-  // Confere se cada campo foi preenchido corretamente antes de enviar.
-  function validate(): FormErrors {
-    const nextErrors: FormErrors = {};
-
-    if (!form.ticker.trim()) nextErrors.ticker = "Informe o ticker.";
-    if (!form.name.trim()) nextErrors.name = "Informe o nome da empresa.";
-
-    const quantity = Number(form.quantity);
-    if (!form.quantity || quantity <= 0) nextErrors.quantity = "Informe uma quantidade maior que zero.";
-
-    const buyPrice = Number(form.buyPrice);
-    if (!form.buyPrice || buyPrice <= 0) nextErrors.buyPrice = "Informe um preço de compra válido.";
-
-    const currentPrice = Number(form.currentPrice);
-    if (!form.currentPrice || currentPrice <= 0)
-      nextErrors.currentPrice = "Informe um preço atual válido.";
-
-    if (!form.purchaseDate) nextErrors.purchaseDate = "Informe a data da compra.";
-
-    return nextErrors;
-  }
-
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-
-    const validationErrors = validate();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
-
-    setIsSubmitting(true);
-    try {
-      await onSubmit({
-        ticker: form.ticker.trim().toUpperCase(),
-        name: form.name.trim(),
-        quantity: Number(form.quantity),
-        buyPrice: Number(form.buyPrice),
-        currentPrice: Number(form.currentPrice),
-        purchaseDate: form.purchaseDate,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  async function onValid(values: StockFormValues) {
+    await onSubmit({
+      ticker: values.ticker.trim().toUpperCase(),
+      name: values.name.trim(),
+      quantity: Number(values.quantity),
+      buyPrice: Number(values.buyPrice),
+      currentPrice: Number(values.currentPrice),
+      purchaseDate: values.purchaseDate,
+    });
   }
 
   return (
@@ -108,7 +71,7 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate>
+        <form onSubmit={handleSubmit(onValid)} noValidate>
           <div className={styles.grid}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="ticker">
@@ -118,10 +81,15 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 id="ticker"
                 className={`${styles.input} ${errors.ticker ? styles.inputError : ""}`}
                 placeholder="Ex: PETR4"
-                value={form.ticker}
-                onChange={(e) => handleChange("ticker", e.target.value)}
+                aria-invalid={Boolean(errors.ticker)}
+                aria-describedby={errors.ticker ? "ticker-error" : undefined}
+                {...register("ticker")}
               />
-              {errors.ticker && <span className={styles.errorMessage}>{errors.ticker}</span>}
+              {errors.ticker && (
+                <span id="ticker-error" className={styles.errorMessage}>
+                  {errors.ticker.message}
+                </span>
+              )}
             </div>
 
             <div className={styles.field}>
@@ -134,10 +102,15 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 min="0"
                 className={`${styles.input} ${errors.quantity ? styles.inputError : ""}`}
                 placeholder="Ex: 100"
-                value={form.quantity}
-                onChange={(e) => handleChange("quantity", e.target.value)}
+                aria-invalid={Boolean(errors.quantity)}
+                aria-describedby={errors.quantity ? "quantity-error" : undefined}
+                {...register("quantity")}
               />
-              {errors.quantity && <span className={styles.errorMessage}>{errors.quantity}</span>}
+              {errors.quantity && (
+                <span id="quantity-error" className={styles.errorMessage}>
+                  {errors.quantity.message}
+                </span>
+              )}
             </div>
           </div>
 
@@ -149,10 +122,15 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
               id="name"
               className={`${styles.input} ${errors.name ? styles.inputError : ""}`}
               placeholder="Ex: Petrobras"
-              value={form.name}
-              onChange={(e) => handleChange("name", e.target.value)}
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? "name-error" : undefined}
+              {...register("name")}
             />
-            {errors.name && <span className={styles.errorMessage}>{errors.name}</span>}
+            {errors.name && (
+              <span id="name-error" className={styles.errorMessage}>
+                {errors.name.message}
+              </span>
+            )}
           </div>
 
           <div className={styles.grid}>
@@ -167,10 +145,15 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 step="0.01"
                 className={`${styles.input} ${errors.buyPrice ? styles.inputError : ""}`}
                 placeholder="Ex: 28.50"
-                value={form.buyPrice}
-                onChange={(e) => handleChange("buyPrice", e.target.value)}
+                aria-invalid={Boolean(errors.buyPrice)}
+                aria-describedby={errors.buyPrice ? "buyPrice-error" : undefined}
+                {...register("buyPrice")}
               />
-              {errors.buyPrice && <span className={styles.errorMessage}>{errors.buyPrice}</span>}
+              {errors.buyPrice && (
+                <span id="buyPrice-error" className={styles.errorMessage}>
+                  {errors.buyPrice.message}
+                </span>
+              )}
             </div>
 
             <div className={styles.field}>
@@ -184,11 +167,14 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 step="0.01"
                 className={`${styles.input} ${errors.currentPrice ? styles.inputError : ""}`}
                 placeholder="Ex: 35.20"
-                value={form.currentPrice}
-                onChange={(e) => handleChange("currentPrice", e.target.value)}
+                aria-invalid={Boolean(errors.currentPrice)}
+                aria-describedby={errors.currentPrice ? "currentPrice-error" : undefined}
+                {...register("currentPrice")}
               />
               {errors.currentPrice && (
-                <span className={styles.errorMessage}>{errors.currentPrice}</span>
+                <span id="currentPrice-error" className={styles.errorMessage}>
+                  {errors.currentPrice.message}
+                </span>
               )}
             </div>
           </div>
@@ -197,15 +183,21 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
             <label className={styles.label} htmlFor="purchaseDate">
               Data da compra
             </label>
-            <input
-              id="purchaseDate"
-              type="date"
-              className={`${styles.input} ${errors.purchaseDate ? styles.inputError : ""}`}
-              value={form.purchaseDate}
-              onChange={(e) => handleChange("purchaseDate", e.target.value)}
+            <Controller
+              name="purchaseDate"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  id="purchaseDate"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  hasError={Boolean(errors.purchaseDate)}
+                />
+              )}
             />
             {errors.purchaseDate && (
-              <span className={styles.errorMessage}>{errors.purchaseDate}</span>
+              <span className={styles.errorMessage}>{errors.purchaseDate.message}</span>
             )}
           </div>
 

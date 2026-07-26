@@ -1,0 +1,40 @@
+/* Container que recebe as duas páginas (a que está saindo e a que
+   está entrando) durante os ~300ms da transição. Precisa de
+   "position: relative" para que a página que está SAINDO possa virar
+   "position: absolute" sem empurrar o layout para baixo. */
+.transitionRoot {
+  position: relative;
+}
+
+.pageWrapper {
+  width: 100%;
+}
+
+/* Página entrando: some de baixo, com fade */
+.pageEnter {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.pageEnterActive {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+/* Página saindo: fica "flutuando" por cima (absolute) enquanto
+   desaparece, para não deixar espaço vazio no lugar dela */
+.pageExit {
+  opacity: 1;
+  transform: translateY(0);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.pageExitActive {
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}

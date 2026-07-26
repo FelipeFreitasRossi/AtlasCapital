@@ -12,6 +12,7 @@ import pageStyles from "./Page.module.css";
 import filterStyles from "./WalletFilters.module.css";
 import { StockTable } from "../components/StockTable/StockTable";
 import { Reveal } from "../components/Reveal/Reveal";
+import { PageHeader } from "../components/PageHeader/PageHeader";
 import { useWalletContext } from "../components/Layout/AppShell";
 
 export function WalletPage() {
@@ -53,15 +54,14 @@ export function WalletPage() {
 
   return (
     <div>
-      <div className={pageStyles.pageHeader}>
-        <div className={pageStyles.pageTitle}>Minha Carteira</div>
-        <div className={pageStyles.pageSubtitle}>
-          {filteredStocks.length} de {stocks.length}{" "}
-          {stocks.length === 1 ? "ação cadastrada" : "ações cadastradas"}
-        </div>
-      </div>
+      <PageHeader
+        title="Minha Carteira"
+        subtitle={`${filteredStocks.length} de ${stocks.length} ${
+          stocks.length === 1 ? "ação cadastrada" : "ações cadastradas"
+        }`}
+      />
 
-      <Reveal>
+      <Reveal delay={0}>
         <div className={filterStyles.filters}>
           <div className={filterStyles.field}>
             <label className={filterStyles.label} htmlFor="search">
@@ -110,7 +110,7 @@ export function WalletPage() {
         </div>
       </Reveal>
 
-      <Reveal delay={0.05}>
+      <Reveal delay={0.12}>
         <StockTable
           stocks={filteredStocks}
           onEdit={openEditForm}
