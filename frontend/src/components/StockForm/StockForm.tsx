@@ -1,10 +1,11 @@
+// frontend/src/components/StockForm/StockForm.tsx
 
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import styles from "./StockForm.module.css";
-import { DateField } from "../DateField/DateField"; // <- caminho corrigido
+import { DateField } from "../DateField/DateField";
 import type { StockInput, StockWithMetrics } from "../../types/stock";
 
 interface StockFormProps {
@@ -102,6 +103,7 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 id="quantity"
                 type="number"
                 min="0"
+                step="0.01"
                 className={`${styles.input} ${errors.quantity ? styles.inputError : ""}`}
                 placeholder="Ex: 100"
                 aria-invalid={Boolean(errors.quantity)}
@@ -171,7 +173,12 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
               name="purchaseDate"
               control={control}
               render={({ field }) => (
-                <DateField id="purchaseDate" value={field.value ?? ""} onChange={field.onChange} error={errors.purchaseDate?.message} />
+                <DateField
+                  id="purchaseDate"
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  error={errors.purchaseDate?.message}
+                />
               )}
             />
             {errors.purchaseDate && (

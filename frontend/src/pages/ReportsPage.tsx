@@ -1,13 +1,9 @@
-// Página dedicada a gerar relatórios. Mostra uma pré-visualização
-// (só leitura) dos dados que vão para o arquivo, e os botões pra
-// baixar em PDF, Excel ou CSV — usando exatamente o mesmo
-// "reportService" e os mesmos dados da carteira, sem duplicar lógica.
+// frontend/src/pages/ReportsPage.tsx
 
 import pageStyles from "./Page.module.css";
 import previewStyles from "./ReportsPreview.module.css";
 import { ExportButtons } from "../components/ExportButtons/ExportButtons";
 import { Reveal } from "../components/Reveal/Reveal";
-import { PageHeader } from "../components/PageHeader/PageHeader";
 import { useWalletContext } from "../components/Layout/AppShell";
 
 function formatCurrency(value: number): string {
@@ -27,13 +23,18 @@ export function ReportsPage() {
 
   return (
     <div>
-      <PageHeader title="Relatórios" subtitle="Baixe o resumo da sua carteira em PDF, Excel ou CSV" />
+      <div className={pageStyles.pageHeader}>
+        <div className={pageStyles.pageTitle}>Relatórios</div>
+        <div className={pageStyles.pageSubtitle}>
+          Baixe o resumo da sua carteira em PDF, Excel ou CSV
+        </div>
+      </div>
 
       <Reveal delay={0}>
         <ExportButtons stocks={stocks} />
       </Reveal>
 
-      <Reveal delay={0.12} className={pageStyles.sectionGap}>
+      <Reveal delay={0.05} className={pageStyles.sectionGap}>
         <div className={previewStyles.previewCard}>
           <div className={previewStyles.previewHeader}>Pré-visualização</div>
           <div className={previewStyles.previewHint}>
@@ -41,7 +42,7 @@ export function ReportsPage() {
           </div>
 
           {stocks.length === 0 ? (
-            <div className={previewStyles.previewHint}>Nenhuma ação cadastrada ainda.</div>
+            <div className={previewStyles.emptyState}>Nenhuma ação cadastrada ainda.</div>
           ) : (
             <div className={previewStyles.tableWrapper}>
               <table className={previewStyles.table}>
@@ -50,18 +51,28 @@ export function ReportsPage() {
                     <th>Ticker</th>
                     <th>Empresa</th>
                     <th className={previewStyles.numeric}>Quantidade</th>
+                    <th className={previewStyles.numeric}>Preço Compra</th>
+                    <th className={previewStyles.numeric}>Preço Atual</th>
                     <th className={previewStyles.numeric}>Resultado</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {stocks.map((stock) => (
-                    <tr key={stock.id}>
-                      <td>{stock.ticker}</td>
-                      <td>{stock.name}</td>
-                      <td className={previewStyles.numeric}>{stock.quantity}</td>
-                      <td className={previewStyles.numeric}>{formatCurrency(stock.profitLoss)}</td>
-                    </tr>
-                  ))}
+                  {stocks.map((stock) => {
+                    const result = stock.quantity * (stock.currentPrice - stock.buyPrice);
+                    const isPositive = result >= 0;
+                    return (
+                      <tr key={stock.id}>
+                        <td className={previewStyles.tickerCell}>{stock.ticker}</td>
+                        <td>{stock.name}</td>
+                        <td className={previewStyles.numeric}>{stock.quantity}</td>
+                        <td className={previewStyles.numeric}>{formatCurrency(stock.buyPrice)}</td>
+                        <td className={previewStyles.numeric}>{formatCurrency(stock.currentPrice)}</td>
+                        <td className={`${previewStyles.numeric} ${isPositive ? previewStyles.positive : previewStyles.negative}`}>
+                          {formatCurrency(result)}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

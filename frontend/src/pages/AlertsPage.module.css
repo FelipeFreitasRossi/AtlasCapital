@@ -10,6 +10,7 @@
 @media (max-width: 860px) {
   .layout {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
@@ -20,6 +21,13 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
   padding: 22px;
+}
+
+@media (max-width: 480px) {
+  .formCard,
+  .listCard {
+    padding: 16px;
+  }
 }
 
 .cardTitle {
@@ -42,7 +50,6 @@
   margin-bottom: 6px;
 }
 
-.select,
 .input {
   width: 100%;
   border: 1px solid var(--border-subtle);
@@ -51,6 +58,12 @@
   font-size: 14px;
   color: var(--text-primary);
   background: var(--bg-base);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--gold-500);
 }
 
 .submitButton {
@@ -63,6 +76,11 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  filter: brightness(1.05);
 }
 
 .submitButton:disabled {
@@ -82,6 +100,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .refreshButton {
@@ -96,11 +116,17 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
 }
 
-.refreshButton:hover {
+.refreshButton:hover:not(:disabled) {
   background: var(--bg-surface-hover);
   color: var(--text-primary);
+}
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .alertList {
@@ -116,6 +142,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   padding: 14px;
+  transition: border-color 0.2s;
 }
 
 .alertItemTriggered {
@@ -163,6 +190,8 @@
   cursor: pointer;
   padding: 4px;
   flex-shrink: 0;
+  transition: color 0.2s;
+  margin-top: 2px;
 }
 
 .deleteButton:hover {

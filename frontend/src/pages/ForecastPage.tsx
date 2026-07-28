@@ -18,6 +18,7 @@ import { PageHeader } from "../components/PageHeader/PageHeader";
 import { Reveal } from "../components/Reveal/Reveal";
 import { useWalletContext } from "../components/Layout/AppShell";
 import { getForecast } from "../services/aiService";
+import { StockSelector } from "../components/StockSelector/StockSelector";
 import type { ForecastResponse, HorizonDays } from "../types/aiFeatures";
 
 const HORIZON_OPTIONS: HorizonDays[] = [7, 30, 90];
@@ -86,6 +87,7 @@ const TREND_CLASS: Record<string, string> = {
 
 export function ForecastPage() {
   const { stocks } = useWalletContext();
+
   const [selectedTicker, setSelectedTicker] = useState(stocks[0]?.ticker ?? "");
   const [horizonDays, setHorizonDays] = useState<HorizonDays>(30);
   const [result, setResult] = useState<ForecastResponse | null>(null);
@@ -126,21 +128,13 @@ export function ForecastPage() {
           <>
             <div className={forecastStyles.controls}>
               <div className={forecastStyles.field}>
-                <label className={forecastStyles.label} htmlFor="forecast-ticker">
-                  Ação
-                </label>
-                <select
-                  id="forecast-ticker"
-                  className={forecastStyles.select}
+                <StockSelector
+                  stocks={stocks.map((s) => ({ id: s.id, ticker: s.ticker, name: s.name }))}
                   value={selectedTicker}
-                  onChange={(e) => setSelectedTicker(e.target.value)}
-                >
-                  {stocks.map((stock) => (
-                    <option key={stock.id} value={stock.ticker}>
-                      {stock.ticker} — {stock.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSelectedTicker}
+                  label="Ação"
+                  placeholder="Buscar ação..."
+                />
               </div>
 
               <div className={forecastStyles.field}>

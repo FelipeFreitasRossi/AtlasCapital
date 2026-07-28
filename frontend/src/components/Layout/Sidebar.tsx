@@ -3,7 +3,7 @@
 import { LayoutDashboard, Wallet, FileBarChart, TrendingUp, Wand2, BellRing, X, Plus, LogOut } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Sidebar.module.css";
-import { useAuth } from "../../context/AuthContext"; // <-- usar Context
+import { useAuth } from "../../context/AuthContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ const NAV_ITEMS = [
 ];
 
 export function Sidebar({ isOpen, onClose, onAddStock }: SidebarProps) {
-  const { user, logout } = useAuth(); // <-- do Context
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -31,6 +31,7 @@ export function Sidebar({ isOpen, onClose, onAddStock }: SidebarProps) {
 
   return (
     <>
+      {/* Overlay (mobile) */}
       <div
         className={`${styles.overlay} ${isOpen ? styles.overlayVisible : ""}`}
         onClick={onClose}

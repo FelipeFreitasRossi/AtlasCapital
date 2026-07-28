@@ -1,19 +1,13 @@
-// Página com a visão completa da carteira: filtros por ticker/nome e
-// por período de compra, além da tabela (que já sabe se ordenar
-// sozinha ao clicar nos cabeçalhos, veja StockTable.tsx).
-//
-// Importante: filtrar e ordenar são coisas diferentes.
-// - FILTRAR (feito aqui nesta página) decide QUAIS linhas aparecem.
-// - ORDENAR (feito dentro do StockTable) decide a ORDEM das linhas
-//   que já passaram pelo filtro.
+// frontend/src/pages/WalletPage.tsx
 
 import { useMemo, useState } from "react";
+import { Search, X } from "lucide-react";
 import pageStyles from "./Page.module.css";
 import filterStyles from "./WalletFilters.module.css";
 import { StockTable } from "../components/StockTable/StockTable";
 import { Reveal } from "../components/Reveal/Reveal";
-import { PageHeader } from "../components/PageHeader/PageHeader";
 import { useWalletContext } from "../components/Layout/AppShell";
+import { DateField } from "../components/DateField/DateField";
 
 export function WalletPage() {
   const { stocks, isLoading, error, openEditForm, handleDelete } = useWalletContext();
@@ -44,6 +38,10 @@ export function WalletPage() {
     setDateTo("");
   }
 
+  function clearSearch() {
+    setSearchTerm("");
+  }
+
   if (isLoading) {
     return <div className={pageStyles.loadingState}>Carregando sua carteira...</div>;
   }
@@ -54,38 +52,50 @@ export function WalletPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Minha Carteira"
-        subtitle={`${filteredStocks.length} de ${stocks.length} ${
-          stocks.length === 1 ? "ação cadastrada" : "ações cadastradas"
-        }`}
-      />
+      <div className={pageStyles.pageHeader}>
+        <div className={pageStyles.pageTitle}>Minha Carteira</div>
+        <div className={pageStyles.pageSubtitle}>
+          {filteredStocks.length} de {stocks.length}{" "}
+          {stocks.length === 1 ? "ação cadastrada" : "ações cadastradas"}
+        </div>
+      </div>
 
-      <Reveal delay={0}>
+      <Reveal>
         <div className={filterStyles.filters}>
           <div className={filterStyles.field}>
             <label className={filterStyles.label} htmlFor="search">
               Ticker ou empresa
             </label>
-            <input
-              id="search"
-              className={filterStyles.input}
-              placeholder="Ex: PETR4"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className={filterStyles.searchWrapper}>
+              <Search size={16} className={filterStyles.searchIcon} />
+              <input
+                id="search"
+                className={filterStyles.input}
+                placeholder="Ex: PETR4 ou Petrobras"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  className={filterStyles.clearSearch}
+                  onClick={clearSearch}
+                  aria-label="Limpar busca"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className={filterStyles.field}>
             <label className={filterStyles.label} htmlFor="dateFrom">
               Comprado a partir de
             </label>
-            <input
+            <DateField
               id="dateFrom"
-              type="date"
-              className={filterStyles.input}
               value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
+              onChange={setDateFrom}
+              placeholder="Data inicial"
             />
           </div>
 
@@ -93,12 +103,11 @@ export function WalletPage() {
             <label className={filterStyles.label} htmlFor="dateTo">
               Comprado até
             </label>
-            <input
+            <DateField
               id="dateTo"
-              type="date"
-              className={filterStyles.input}
               value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
+              onChange={setDateTo}
+              placeholder="Data final"
             />
           </div>
 
@@ -110,7 +119,7 @@ export function WalletPage() {
         </div>
       </Reveal>
 
-      <Reveal delay={0.12}>
+      <Reveal delay={0.05}>
         <StockTable
           stocks={filteredStocks}
           onEdit={openEditForm}

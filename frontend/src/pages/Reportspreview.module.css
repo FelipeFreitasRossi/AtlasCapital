@@ -1,3 +1,5 @@
+/* frontend/src/pages/ReportsPreview.module.css */
+
 .previewCard {
   background: linear-gradient(160deg, var(--bg-elevated), var(--bg-surface));
   border: 1px solid var(--border-subtle);
@@ -20,14 +22,24 @@
   color: var(--text-secondary);
 }
 
+.emptyState {
+  padding: 20px 22px 24px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
 .tableWrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* rolagem suave em iOS */
+  padding: 0 4px 4px 4px;
 }
 
 .table {
   width: 100%;
+  min-width: 640px; /* garante que a tabela tenha largura mínima para scroll horizontal */
   border-collapse: collapse;
-  min-width: 600px;
+  font-size: 13px;
 }
 
 .table th {
@@ -36,22 +48,68 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
-  padding: 12px 22px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
 }
 
 .table td {
-  padding: 12px 22px;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--border-subtle);
-  font-size: 13px;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .table tbody tr:last-child td {
   border-bottom: none;
 }
 
+.table tbody tr:hover {
+  background: var(--bg-surface);
+}
+
 .numeric {
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+.tickerCell {
+  font-weight: 600;
+  color: var(--gold-400);
+}
+
+.positive {
+  color: var(--green-400);
+}
+
+.negative {
+  color: var(--red-400);
+}
+
+/* Responsividade: em telas pequenas, reduzimos padding e font-size,
+   e o wrapper já garante o scroll horizontal */
+@media (max-width: 640px) {
+  .previewHeader {
+    padding: 16px 16px 4px;
+    font-size: 14px;
+  }
+  .previewHint {
+    padding: 0 16px 12px;
+    font-size: 12px;
+  }
+  .table {
+    font-size: 12px;
+    min-width: 520px;
+  }
+  .table th {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+  .table td {
+    padding: 8px 10px;
+  }
+  .emptyState {
+    padding: 16px;
+    font-size: 12px;
+  }
 }

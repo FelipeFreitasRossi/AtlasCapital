@@ -1,7 +1,10 @@
+// frontend/src/components/DateField/DateField.tsx
+
 import { DayPicker } from "react-day-picker";
 import { useState, useRef, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { CalendarIcon, X } from "lucide-react";
 import styles from "./DateField.module.css";
 import "react-day-picker/style.css";
 
@@ -38,17 +41,35 @@ export function DateField({ id, value, onChange, error, placeholder = "Selecione
     setIsOpen(false);
   };
 
+  const clearDate = () => {
+    onChange("");
+    setIsOpen(false);
+  };
+
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
-      <input
-        id={id}
-        type="text"
-        className={`${styles.input} ${error ? styles.inputError : ""}`}
-        value={value ? format(parseISO(value), "dd/MM/yyyy") : ""}
-        placeholder={placeholder}
-        onFocus={() => setIsOpen(true)}
-        readOnly
-      />
+      <div className={styles.inputWrapper}>
+        <CalendarIcon size={16} className={styles.calendarIcon} />
+        <input
+          id={id}
+          type="text"
+          className={`${styles.input} ${error ? styles.inputError : ""}`}
+          value={value ? format(parseISO(value), "dd/MM/yyyy") : ""}
+          placeholder={placeholder}
+          onFocus={() => setIsOpen(true)}
+          readOnly
+        />
+        {value && (
+          <button
+            className={styles.clearDate}
+            onClick={clearDate}
+            aria-label="Limpar data"
+            type="button"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
       {isOpen && (
         <div className={styles.popover}>
           <DayPicker
@@ -56,6 +77,7 @@ export function DateField({ id, value, onChange, error, placeholder = "Selecione
             selected={selectedDate}
             onSelect={handleSelect}
             locale={ptBR}
+            className={styles.calendar}
           />
         </div>
       )}

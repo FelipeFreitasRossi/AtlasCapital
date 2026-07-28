@@ -26,8 +26,10 @@ function App() {
   const { stocks, totals, isLoading, error, saveStock, removeStock } = useStocks();
   const { isAuthenticated, isCheckingSession } = useAuth();
 
+  // Verificação periódica de alertas
   useEffect(() => {
     if (!isAuthenticated || stocks.length === 0) return;
+
     const interval = setInterval(async () => {
       try {
         const response = await checkAlerts(stocks, totals.currentValue);
@@ -38,17 +40,12 @@ function App() {
         // silencioso
       }
     }, 25000);
+
     return () => clearInterval(interval);
   }, [isAuthenticated, stocks, totals.currentValue]);
 
   const [showSplash, setShowSplash] = useState(true);
   const [editingStock, setEditingStock] = useState<StockWithMetrics | null | undefined>(undefined);
-
-  // Fallback: se a Splash não sumir, força após 4s
-  useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 4000);
-    return () => clearTimeout(timer);
-  }, []);
 
   function openCreateForm() { setEditingStock(null); }
   function openEditForm(stock: StockWithMetrics) { setEditingStock(stock); }
@@ -77,6 +74,7 @@ function App() {
     }
   }
 
+  // Se a Splash ainda estiver visível, renderiza ela
   if (showSplash) {
     return (
       <SplashScreen

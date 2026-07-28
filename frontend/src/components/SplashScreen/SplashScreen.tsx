@@ -1,8 +1,4 @@
-// A Splash Screen é a primeira coisa que aparece quando o app abre.
-// Ela fica visível por um tempo mínimo (pra não "piscar" rápido demais
-// e parecer um bug) E até os dados da carteira terminarem de carregar
-// — o que demorar mais entre os dois. Depois disso, ela desaparece com
-// um fade suave, revelando o conteúdo principal do app.
+// frontend/src/components/SplashScreen/SplashScreen.tsx
 
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
@@ -20,12 +16,9 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
   const logoRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const hasExitedRef = useRef(false);
-
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
-  // Animação de ENTRADA do logo: some da tela girado e pequeno,
-  // depois "revela" no tamanho certo com um leve exagero (back.out),
-  // e por fim entra em um pulsar suave e contínuo (respiração).
+  // Animação de entrada do logo
   useEffect(() => {
     if (!logoRef.current) return;
 
@@ -34,7 +27,7 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
       .fromTo(
         logoRef.current,
         { opacity: 0, scale: 0.5, rotate: -12 },
-        { opacity: 1, scale: 1, rotate: 0, duration: 0.9, ease: "back.out(1.7)" },
+        { opacity: 1, scale: 1, rotate: 0, duration: 0.9, ease: "back.out(1.7)" }
       )
       .to(logoRef.current, {
         boxShadow: "0 0 40px var(--gold-glow)",
@@ -49,8 +42,7 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
     };
   }, []);
 
-  // Barra de progresso: anda sozinha até 90% no tempo mínimo de exibição,
-  // e só completa os 10% finais quando os dados realmente chegam.
+  // Barra de progresso
   useEffect(() => {
     if (!progressRef.current) return;
 
@@ -58,15 +50,35 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
       width: "90%",
       duration: MIN_DISPLAY_MS / 1000,
       ease: "power1.inOut",
+      onComplete: () => setMinTimeElapsed(true),
     });
 
-    const timer = setTimeout(() => setMinTimeElapsed(true), MIN_DISPLAY_MS);
+    // Fallback: se o GSAP falhar, marca como concluído após o tempo mínimo
+    const timer = setTimeout(() => setMinTimeElapsed(true), MIN_DISPLAY_MS + 200);
+
     return () => clearTimeout(timer);
   }, []);
 
-  // Quando o tempo mínimo já passou E os dados já carregaram, dispara a saída.
+  // Quando o tempo mínimo passou E os dados carregaram, dispara a saída
   useEffect(() => {
-    if (!minTimeElapsed || !isDataLoaded || hasExitedRef.current) return;
+    if (minTimeElapsed && isDataLoaded && !hasExitedRef.current) {
+      handleFinish();
+    }
+  }, [minTimeElapsed, isDataLoaded]);
+
+  // Fallback de segurança: se depois de 5 segundos ainda não saiu, força saída
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasExitedRef.current) {
+        handleFinish();
+      }
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleFinish = () => {
+    if (hasExitedRef.current) return;
     hasExitedRef.current = true;
 
     if (progressRef.current) {
@@ -80,7 +92,7 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
       ease: "power1.inOut",
       onComplete: onFinished,
     });
-  }, [minTimeElapsed, isDataLoaded, onFinished]);
+  };
 
   return (
     <div className={styles.splash} ref={containerRef}>
@@ -88,10 +100,7 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
         <div className={styles.logoRing} ref={logoRef}>
           <span className={styles.logoLetters}>AC</span>
         </div>
-        <div>
-          <div className={styles.brandName}>AtlasCapital</div>
-          <div className={styles.tagline}>Carregando sua carteira...</div>
-        </div>
+        <div className={styles.brandName}>AtlasCapital</div>
         <div className={styles.progressTrack}>
           <div className={styles.progressFill} ref={progressRef} />
         </div>

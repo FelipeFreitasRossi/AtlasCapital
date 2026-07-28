@@ -1,36 +1,42 @@
 // frontend/src/pages/AlertsPage.tsx
 
 import { useEffect, useState } from "react";
-import { Bell, BellRing, RefreshCw, Trash2 } from "lucide-react";
+import { Bell, BellRing, RefreshCw, Trash2, AlertTriangle, TrendingUp, TrendingDown, DollarSign, PieChart } from "lucide-react";
 import styles from "./AlertsPage.module.css";
 import { PageHeader } from "../components/PageHeader/PageHeader";
 import { Reveal } from "../components/Reveal/Reveal";
 import { useWalletContext } from "../components/Layout/AppShell";
 import { checkAlerts, createAlert, deleteAlert, listAlerts } from "../services/aiService";
 import { pushToast } from "../components/Toast/toastStore";
+import { ModalSelector } from "../components/ModalSelector/ModalSelector";
 import type { AlertOut, AlertType } from "../types/aiFeatures";
 
-const TYPE_LABELS: Record<AlertType, string> = {
-  price_drop_percent: "Queda percentual (vs. preço de compra)",
-  price_target_above: "Preço acima de",
-  price_target_below: "Preço abaixo de",
-  portfolio_value_above: "Patrimônio total acima de",
-};
-
-function describeAlert(alert: AlertOut): string {
-  switch (alert.type) {
-    case "price_drop_percent":
-      return `${alert.ticker}: avisar se cair ${alert.thresholdPercent}% do preço de compra`;
-    case "price_target_above":
-      return `${alert.ticker}: avisar se passar de R$ ${alert.thresholdPrice?.toFixed(2)}`;
-    case "price_target_below":
-      return `${alert.ticker}: avisar se cair abaixo de R$ ${alert.thresholdPrice?.toFixed(2)}`;
-    case "portfolio_value_above":
-      return `Patrimônio: avisar se ultrapassar R$ ${alert.thresholdValue?.toFixed(2)}`;
-    default:
-      return "Alerta";
-  }
-}
+const TYPE_OPTIONS = [
+  {
+    value: "price_drop_percent",
+    label: "Queda percentual",
+    description: "Avisa quando a ação cai X% do preço de compra",
+    icon: <TrendingDown size={18} />,
+  },
+  {
+    value: "price_target_above",
+    label: "Preço acima de",
+    description: "Avisa quando a ação ultrapassa um valor",
+    icon: <TrendingUp size={18} />,
+  },
+  {
+    value: "price_target_below",
+    label: "Preço abaixo de",
+    description: "Avisa quando a ação cai abaixo de um valor",
+    icon: <TrendingDown size={18} />,
+  },
+  {
+    value: "portfolio_value_above",
+    label: "Patrimônio total",
+    description: "Avisa quando o patrimônio ultrapassa um valor",
+    icon: <PieChart size={18} />,
+  },
+];
 
 export function AlertsPage() {
   const { stocks, totals } = useWalletContext();
@@ -46,6 +52,12 @@ export function AlertsPage() {
   const [thresholdValue, setThresholdValue] = useState(10000);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  // Opções para o seletor de ativos
+  const stockOptions = stocks.map((s) => ({
+    value: s.ticker,
+    label: `${s.ticker} - ${s.name}`,
+  }));
 
   async function refreshAlerts() {
     setIsListLoading(true);
@@ -125,35 +137,31 @@ export function AlertsPage() {
           <div className={styles.formCard}>
             <div className={styles.cardTitle}>Novo alerta</div>
 
+            {/* Tipo de Alerta */}
             <div className={styles.field}>
-              <label className={styles.label} htmlFor="alert-type">
-                Tipo de alerta
-              </label>
-              <select id="alert-type" className={styles.select} value={type} onChange={(e) => setType(e.target.value as AlertType)}>
-                {Object.entries(TYPE_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+              <label className={styles.label}>Tipo de alerta</label>
+              <ModalSelector
+                options={TYPE_OPTIONS}
+                value={type}
+                onChange={(val) => setType(val as AlertType)}
+                placeholder="Selecione o tipo..."
+              />
             </div>
 
+            {/* Ativo (se não for patrimônio) */}
             {type !== "portfolio_value_above" && (
               <div className={styles.field}>
-                <label className={styles.label} htmlFor="alert-ticker">
-                  Ativo
-                </label>
-                <select id="alert-ticker" className={styles.select} value={ticker} onChange={(e) => setTicker(e.target.value)}>
-                  {stocks.length === 0 && <option value="">Nenhuma ação cadastrada</option>}
-                  {stocks.map((stock) => (
-                    <option key={stock.id} value={stock.ticker}>
-                      {stock.ticker} — {stock.name}
-                    </option>
-                  ))}
-                </select>
+                <label className={styles.label}>Ativo</label>
+                <ModalSelector
+                  options={stockOptions}
+                  value={ticker}
+                  onChange={setTicker}
+                  placeholder="Selecione um ativo..."
+                />
               </div>
             )}
 
+            {/* Campos específicos por tipo */}
             {type === "price_drop_percent" && (
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="alert-percent">
@@ -258,4 +266,20 @@ export function AlertsPage() {
       </Reveal>
     </div>
   );
+}
+
+// Função auxiliar para descrever o alerta
+function describeAlert(alert: AlertOut): string {
+  switch (alert.type) {
+    case "price_drop_percent":
+      return `${alert.ticker}: avisar se cair ${alert.thresholdPercent}% do preço de compra`;
+    case "price_target_above":
+      return `${alert.ticker}: avisar se passar de R$ ${alert.thresholdPrice?.toFixed(2)}`;
+    case "price_target_below":
+      return `${alert.ticker}: avisar se cair abaixo de R$ ${alert.thresholdPrice?.toFixed(2)}`;
+    case "portfolio_value_above":
+      return `Patrimônio: avisar se ultrapassar R$ ${alert.thresholdValue?.toFixed(2)}`;
+    default:
+      return "Alerta";
+  }
 }

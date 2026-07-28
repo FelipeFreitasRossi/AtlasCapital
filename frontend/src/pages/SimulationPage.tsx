@@ -1,12 +1,11 @@
-// frontend/src/pages/SimulationPage.tsx
-
 import { useEffect, useState } from "react";
-import { AlertTriangle, Wand2 } from "lucide-react";
+import { AlertTriangle, Wand2, ChevronDown } from "lucide-react";
 import styles from "./SimulationPage.module.css";
 import { PageHeader } from "../components/PageHeader/PageHeader";
 import { Reveal } from "../components/Reveal/Reveal";
 import { useWalletContext } from "../components/Layout/AppShell";
 import { simulateOperation } from "../services/aiService";
+import { StockSelectorModal } from "../components/StockSelectorModal/StockSelectorModal";
 import type { PortfolioMetrics, SimulationResponse } from "../types/aiFeatures";
 
 const NEW_ASSET_OPTION = "__new__";
@@ -44,7 +43,7 @@ export function SimulationPage() {
   const { stocks } = useWalletContext();
 
   const [action, setAction] = useState<"buy" | "sell">("buy");
-  const [selectedOption, setSelectedOption] = useState<string>(stocks[0]?.ticker ?? NEW_ASSET_OPTION);
+  const [selectedTicker, setSelectedTicker] = useState<string>(stocks[0]?.ticker ?? "");
   const [newTicker, setNewTicker] = useState("");
   const [newName, setNewName] = useState("");
   const [quantity, setQuantity] = useState(10);
@@ -52,27 +51,60 @@ export function SimulationPage() {
   const [result, setResult] = useState<SimulationResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const selectedStock = stocks.find((stock) => stock.ticker === selectedOption);
-  const isNewAsset = selectedOption === NEW_ASSET_OPTION;
+  const isNewAsset = selectedTicker === NEW_ASSET_OPTION;
+  const selectedStock = stocks.find((stock) => stock.ticker === selectedTicker);
+
+  const stockOptions = [
+    ...stocks.map((s) => ({ id: s.id, ticker: s.ticker, name: s.name })),
+    { id: NEW_ASSET_OPTION, ticker: "+ Novo ativo", name: "Fora da carteira" },
+  ];
 
   useEffect(() => {
     const basePrice = selectedStock?.currentPrice ?? 50;
     setPrice(Math.round(basePrice * 100) / 100);
     setQuantity(selectedStock ? Math.max(1, Math.min(10, Math.floor(selectedStock.quantity / 2) || 1)) : 10);
-  }, [selectedOption, action, selectedStock]);
+    if (isNewAsset) {
+      setNewTicker("");
+      setNewName("");
+    }
+  }, [selectedTicker, action, selectedStock, isNewAsset]);
 
   const maxQuantity = action === "sell" && selectedStock ? selectedStock.quantity : 1000;
   const referencePrice = selectedStock?.currentPrice ?? (price > 0 ? price : 50);
   const priceMin = Math.max(0.01, referencePrice * 0.5);
   const priceMax = referencePrice * 1.5;
 
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleSelectTicker = (ticker: string) => {
+    setSelectedTicker(ticker);
+  };
+
+  const displayTicker = isNewAsset ? "Novo ativo" : selectedStock?.ticker || "Selecione um ativo";
+
   async function handleSimulate() {
-    const ticker = isNewAsset ? newTicker.trim().toUpperCase() : selectedOption;
-    if (!ticker) {
-      setError("Informe o ticker do ativo.");
-      return;
+    let ticker = "";
+    let name = "";
+
+    if (isNewAsset) {
+      ticker = newTicker.trim().toUpperCase();
+      name = newName.trim() || ticker;
+      if (!ticker) {
+        setError("Informe o ticker do novo ativo.");
+        return;
+      }
+    } else {
+      if (!selectedStock) {
+        setError("Selecione um ativo da carteira.");
+        return;
+      }
+      ticker = selectedStock.ticker;
+      name = selectedStock.name;
     }
+
     if (action === "sell" && !selectedStock) {
       setError("Selecione um ativo que já esteja na sua carteira para simular uma venda.");
       return;
@@ -85,7 +117,7 @@ export function SimulationPage() {
         stocks,
         action,
         ticker,
-        name: isNewAsset ? newName.trim() || ticker : selectedStock?.name,
+        name,
         quantity,
         price,
         currentPrice: selectedStock?.currentPrice,
@@ -124,23 +156,13 @@ export function SimulationPage() {
               </button>
             </div>
 
+            {/* Campo Ativo com modal */}
             <div className={styles.field}>
-              <label className={styles.label} htmlFor="sim-ticker">
-                Ativo
-              </label>
-              <select
-                id="sim-ticker"
-                className={styles.select}
-                value={selectedOption}
-                onChange={(e) => setSelectedOption(e.target.value)}
-              >
-                {stocks.map((stock) => (
-                  <option key={stock.id} value={stock.ticker}>
-                    {stock.ticker} — {stock.name}
-                  </option>
-                ))}
-                {action === "buy" && <option value={NEW_ASSET_OPTION}>+ Novo ativo (fora da carteira)</option>}
-              </select>
+              <label className={styles.label}>Ativo</label>
+              <div className={styles.selectorTrigger} onClick={handleOpenModal}>
+                <span className={styles.selectorText}>{displayTicker}</span>
+                <ChevronDown size={18} className={styles.selectorChevron} />
+              </div>
             </div>
 
             {isNewAsset && action === "buy" && (
@@ -248,6 +270,16 @@ export function SimulationPage() {
           </div>
         </div>
       </Reveal>
+
+      {/* Modal de seleção */}
+      <StockSelectorModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        stocks={stockOptions}
+        selectedTicker={selectedTicker}
+        onSelect={handleSelectTicker}
+        title="Selecionar ativo"
+      />
     </div>
   );
 }
