@@ -1,35 +1,56 @@
-// Controla se a tela de boas-vindas (Onboarding) já foi vista pelo
-// usuário. Guardamos essa informação no localStorage, associada ao
-// usuário logado — assim, se duas pessoas usarem o mesmo navegador,
-// cada uma vê o onboarding na sua própria primeira vez.
+// frontend/src/hooks/useOnboarding.ts
 
-import { useCallback, useState } from "react";
+import { useState, useEffect } from "react";
 
-const STORAGE_PREFIX = "atlascapital:onboarding_seen:";
+const STORAGE_KEY_PREFIX = "atlascapital:onboarding_seen:";
 
-function storageKey(userId: string | null): string {
-  return `${STORAGE_PREFIX}${userId ?? "guest"}`;
-}
+export function useOnboarding() {
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
-export function useOnboarding(userId: string | null) {
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(storageKey(userId)) === "true";
-    } catch {
-      return true;
+  useEffect(() => {
+    // Recupera o ID do usuário da sessão
+    const session = localStorage.getItem("atlascapital:session");
+    let id = null;
+    if (session) {
+      try {
+        const parsed = JSON.parse(session);
+        id = parsed.id || parsed.user?.id || null;
+      } catch {
+        // ignore
+      }
     }
-  });
-
-  const markOnboardingSeen = useCallback(() => {
-    try {
-      localStorage.setItem(storageKey(userId), "true");
-    } catch {
-      // Se o localStorage não estiver disponível, apenas seguimos em
-      // frente sem persistir — o pior caso é o onboarding aparecer
-      // de novo na próxima visita.
+    setUserId(id);
+    if (id) {
+      const seen = localStorage.getItem(`${STORAGE_KEY_PREFIX}${id}`) === "true";
+      setHasSeenOnboarding(seen);
     }
-    setHasSeenOnboarding(true);
-  }, [userId]);
+  }, []);
 
-  return { hasSeenOnboarding, markOnboardingSeen };
+  function markOnboardingAsSeen() {
+    // Tenta pegar o userId novamente, caso ainda não tenha sido setado
+    const currentUserId = userId || (() => {
+      const session = localStorage.getItem("atlascapital:session");
+      if (session) {
+        try {
+          const parsed = JSON.parse(session);
+          return parsed.id || parsed.user?.id || null;
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    })();
+
+    if (currentUserId) {
+      localStorage.setItem(`${STORAGE_KEY_PREFIX}${currentUserId}`, "true");
+      setHasSeenOnboarding(true);
+    } else {
+      // Fallback: se não houver userId, marca como visto globalmente (apenas para demo)
+      localStorage.setItem("atlascapital:onboarding_seen", "true");
+      setHasSeenOnboarding(true);
+    }
+  }
+
+  return { hasSeenOnboarding, markOnboardingAsSeen };
 }

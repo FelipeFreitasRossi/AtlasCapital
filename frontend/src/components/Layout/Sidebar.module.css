@@ -149,6 +149,7 @@
 }
 
 /* ---------- Top bar (mobile) ---------- */
+/* (O TopBar usa o mesmo arquivo de estilo, então mantemos aqui) */
 
 .topBar {
   display: none;

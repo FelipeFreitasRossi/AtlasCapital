@@ -1,62 +1,95 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
-import * as authService from "../services/authService";
-import type { LoginInput, RegisterInput, User } from "../types/auth";
+// frontend/src/context/AuthContext.tsx
 
-interface AuthContextValue {
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { authService } from "../services/authService";
+import type { User, LoginInput, RegisterInput } from "../types/auth";
+
+interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isCheckingSession: boolean;
-  login: (input: LoginInput) => Promise<void>;
-  register: (input: RegisterInput) => Promise<void>;
-  logout: () => Promise<void>;
+  hasSeenOnboarding: boolean;
+  login: (data: LoginInput) => Promise<void>;
+  register: (data: RegisterInput) => Promise<void>;
+  logout: () => void;
+  markOnboardingAsSeen: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
+
+  const checkOnboardingStatus = (userId: string) => {
+    const key = `atlascapital:onboarding_seen:${userId}`;
+    setHasSeenOnboarding(localStorage.getItem(key) === "true");
+  };
 
   useEffect(() => {
-    setUser(authService.getCurrentUser());
-    setIsCheckingSession(false);
+    const loadSession = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          checkOnboardingStatus(currentUser.id);
+        }
+      } catch (error) {
+        console.error("Erro ao restaurar sessão:", error);
+      } finally {
+        setIsCheckingSession(false);
+      }
+    };
+    loadSession();
   }, []);
 
-  const login = useCallback(async (input: LoginInput) => {
-    const loggedUser = await authService.login(input);
+  const login = async (data: LoginInput) => {
+    const loggedUser = await authService.login(data);
     setUser(loggedUser);
-  }, []);
+    checkOnboardingStatus(loggedUser.id);
+  };
 
-  const register = useCallback(async (input: RegisterInput) => {
-    const newUser = await authService.register(input);
+  const register = async (data: RegisterInput) => {
+    const newUser = await authService.register(data);
     setUser(newUser);
-  }, []);
+    checkOnboardingStatus(newUser.id);
+  };
 
-  const logout = useCallback(async () => {
-    await authService.logout();
+  const logout = () => {
+    authService.logout();
     setUser(null);
-  }, []);
+    setHasSeenOnboarding(false);
+  };
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      user,
-      isAuthenticated: user !== null,
-      isCheckingSession,
-      login,
-      register,
-      logout,
-    }),
-    [user, isCheckingSession, login, register, logout],
-  );
+  const markOnboardingAsSeen = () => {
+    if (user?.id) {
+      localStorage.setItem(`atlascapital:onboarding_seen:${user.id}`, "true");
+      setHasSeenOnboarding(true);
+    } else {
+      localStorage.setItem("atlascapital:onboarding_seen", "true");
+      setHasSeenOnboarding(true);
+    }
+  };
+
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    isCheckingSession,
+    hasSeenOnboarding,
+    login,
+    register,
+    logout,
+    markOnboardingAsSeen,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth(): AuthContextValue {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth precisa ser usado dentro de um <AuthProvider>.");
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   return context;
 }

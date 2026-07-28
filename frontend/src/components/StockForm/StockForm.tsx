@@ -1,18 +1,10 @@
-// Este é o formulário (dentro de um modal) usado tanto para CADASTRAR
-// uma ação nova quanto para EDITAR uma que já existe. Sabemos qual dos
-// dois casos estamos vivendo pela prop "initialData": se ela vier
-// preenchida, estamos editando; se vier vazia, estamos criando.
-//
-// A validação é feita com react-hook-form + zod (veja
-// "stockFormSchema.ts"): o zod descreve as regras, o react-hook-form
-// cuida do estado dos campos e mostra os erros automaticamente.
 
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import styles from "./StockForm.module.css";
-import { stockFormSchema } from "./stockFormSchema";
-import type { StockFormValues } from "./stockFormSchema";
-import { DatePicker } from "../DatePicker/DatePicker";
+import { DateField } from "../DateField/DateField"; // <- caminho corrigido
 import type { StockInput, StockWithMetrics } from "../../types/stock";
 
 interface StockFormProps {
@@ -21,57 +13,72 @@ interface StockFormProps {
   onSubmit: (data: StockInput) => Promise<void>;
 }
 
-function toFormValues(stock: StockWithMetrics | null): StockFormValues {
-  if (!stock) {
-    return { ticker: "", name: "", quantity: "", buyPrice: "", currentPrice: "", purchaseDate: "" };
-  }
+const stockSchema = z.object({
+  ticker: z.string().trim().min(1, "Informe o ticker."),
+  name: z.string().trim().min(1, "Informe o nome da empresa."),
+  quantity: z.number({ error: "Informe uma quantidade válida." }).positive("A quantidade deve ser maior que zero."),
+  buyPrice: z.number({ error: "Informe um preço de compra válido." }).positive("O preço de compra deve ser maior que zero."),
+  currentPrice: z.number({ error: "Informe um preço atual válido." }).positive("O preço atual deve ser maior que zero."),
+  purchaseDate: z.string().min(1, "Informe a data da compra."),
+});
+
+type StockFormValues = z.infer<typeof stockSchema>;
+
+function toDefaultValues(stock: StockWithMetrics | null): Partial<StockFormValues> {
+  if (!stock) return { ticker: "", name: "", purchaseDate: "" };
   return {
     ticker: stock.ticker,
     name: stock.name,
-    quantity: String(stock.quantity),
-    buyPrice: String(stock.buyPrice),
-    currentPrice: String(stock.currentPrice),
+    quantity: stock.quantity,
+    buyPrice: stock.buyPrice,
+    currentPrice: stock.currentPrice,
     purchaseDate: stock.purchaseDate,
   };
 }
 
 export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = initialData !== null;
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<StockFormValues>({
-    resolver: zodResolver(stockFormSchema),
-    defaultValues: toFormValues(initialData),
-    mode: "onBlur",
+    resolver: zodResolver(stockSchema),
+    defaultValues: toDefaultValues(initialData),
   });
 
-  async function onValid(values: StockFormValues) {
-    await onSubmit({
-      ticker: values.ticker.trim().toUpperCase(),
-      name: values.name.trim(),
-      quantity: Number(values.quantity),
-      buyPrice: Number(values.buyPrice),
-      currentPrice: Number(values.currentPrice),
-      purchaseDate: values.purchaseDate,
-    });
+  async function onValidSubmit(values: StockFormValues) {
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        ticker: values.ticker.trim().toUpperCase(),
+        name: values.name.trim(),
+        quantity: values.quantity,
+        buyPrice: values.buyPrice,
+        currentPrice: values.currentPrice,
+        purchaseDate: values.purchaseDate,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <div className={styles.overlay} onClick={onCancel}>
-      {/* stopPropagation evita que clicar DENTRO do modal feche ele */}
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="stock-form-title">
         <div className={styles.header}>
-          <div className={styles.title}>{isEditing ? "Editar ação" : "Nova ação"}</div>
+          <div className={styles.title} id="stock-form-title">
+            {isEditing ? "Editar ação" : "Nova ação"}
+          </div>
           <button className={styles.closeButton} onClick={onCancel} aria-label="Fechar">
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onValid)} noValidate>
+        <form onSubmit={handleSubmit(onValidSubmit)} noValidate>
           <div className={styles.grid}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="ticker">
@@ -82,14 +89,9 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 className={`${styles.input} ${errors.ticker ? styles.inputError : ""}`}
                 placeholder="Ex: PETR4"
                 aria-invalid={Boolean(errors.ticker)}
-                aria-describedby={errors.ticker ? "ticker-error" : undefined}
                 {...register("ticker")}
               />
-              {errors.ticker && (
-                <span id="ticker-error" className={styles.errorMessage}>
-                  {errors.ticker.message}
-                </span>
-              )}
+              {errors.ticker && <span className={styles.errorMessage}>{errors.ticker.message}</span>}
             </div>
 
             <div className={styles.field}>
@@ -103,14 +105,9 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 className={`${styles.input} ${errors.quantity ? styles.inputError : ""}`}
                 placeholder="Ex: 100"
                 aria-invalid={Boolean(errors.quantity)}
-                aria-describedby={errors.quantity ? "quantity-error" : undefined}
-                {...register("quantity")}
+                {...register("quantity", { valueAsNumber: true })}
               />
-              {errors.quantity && (
-                <span id="quantity-error" className={styles.errorMessage}>
-                  {errors.quantity.message}
-                </span>
-              )}
+              {errors.quantity && <span className={styles.errorMessage}>{errors.quantity.message}</span>}
             </div>
           </div>
 
@@ -123,14 +120,9 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
               className={`${styles.input} ${errors.name ? styles.inputError : ""}`}
               placeholder="Ex: Petrobras"
               aria-invalid={Boolean(errors.name)}
-              aria-describedby={errors.name ? "name-error" : undefined}
               {...register("name")}
             />
-            {errors.name && (
-              <span id="name-error" className={styles.errorMessage}>
-                {errors.name.message}
-              </span>
-            )}
+            {errors.name && <span className={styles.errorMessage}>{errors.name.message}</span>}
           </div>
 
           <div className={styles.grid}>
@@ -146,14 +138,9 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 className={`${styles.input} ${errors.buyPrice ? styles.inputError : ""}`}
                 placeholder="Ex: 28.50"
                 aria-invalid={Boolean(errors.buyPrice)}
-                aria-describedby={errors.buyPrice ? "buyPrice-error" : undefined}
-                {...register("buyPrice")}
+                {...register("buyPrice", { valueAsNumber: true })}
               />
-              {errors.buyPrice && (
-                <span id="buyPrice-error" className={styles.errorMessage}>
-                  {errors.buyPrice.message}
-                </span>
-              )}
+              {errors.buyPrice && <span className={styles.errorMessage}>{errors.buyPrice.message}</span>}
             </div>
 
             <div className={styles.field}>
@@ -168,13 +155,10 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                 className={`${styles.input} ${errors.currentPrice ? styles.inputError : ""}`}
                 placeholder="Ex: 35.20"
                 aria-invalid={Boolean(errors.currentPrice)}
-                aria-describedby={errors.currentPrice ? "currentPrice-error" : undefined}
-                {...register("currentPrice")}
+                {...register("currentPrice", { valueAsNumber: true })}
               />
               {errors.currentPrice && (
-                <span id="currentPrice-error" className={styles.errorMessage}>
-                  {errors.currentPrice.message}
-                </span>
+                <span className={styles.errorMessage}>{errors.currentPrice.message}</span>
               )}
             </div>
           </div>
@@ -187,13 +171,7 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
               name="purchaseDate"
               control={control}
               render={({ field }) => (
-                <DatePicker
-                  id="purchaseDate"
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  hasError={Boolean(errors.purchaseDate)}
-                />
+                <DateField id="purchaseDate" value={field.value ?? ""} onChange={field.onChange} error={errors.purchaseDate?.message} />
               )}
             />
             {errors.purchaseDate && (

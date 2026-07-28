@@ -1,8 +1,3 @@
-// Layout compartilhado pelas telas de Login e Cadastro: um painel de
-// marca à esquerda (escondido em telas pequenas) e o formulário à
-// direita. Mantém as duas telas visualmente consistentes sem repetir
-// marcação.
-
 import type { ReactNode } from "react";
 import { LineChart, ShieldCheck, Sparkles } from "lucide-react";
 import styles from "./AuthLayout.module.css";

@@ -1,0 +1,119 @@
+/* frontend/src/pages/Auth/OnboardingPage.module.css */
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-base);
+  background-image: radial-gradient(circle at 50% 40%, rgba(212, 175, 55, 0.05), transparent 55%);
+  padding: 20px;
+  position: relative;
+}
+
+.skipButton {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  transition: color 0.2s;
+}
+
+.skipButton:hover {
+  color: var(--text-primary);
+}
+
+.content {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.iconWrapper {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 32px;
+  border-radius: 24px;
+  background: linear-gradient(160deg, var(--bg-elevated), var(--bg-surface));
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-400);
+  box-shadow: var(--shadow-gold);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.description {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  padding: 0;
+}
+
+.dot:hover {
+  transform: scale(1.2);
+}
+
+.dotActive {
+  background: var(--gold-400);
+  width: 28px;
+  border-radius: 5px;
+}
+
+.nextButton {
+  border: none;
+  background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+  color: #1a1404;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 40px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.15s;
+  box-shadow: var(--shadow-gold);
+}
+
+.nextButton:hover {
+  filter: brightness(1.05);
+}
+
+.nextButton:active {
+  transform: scale(0.97);
+}

@@ -1,12 +1,10 @@
-// Página inicial do app. Reúne o resumo da carteira (StatsCards), o
-// gráfico de rendimento (Dashboard) e os botões de exportação rápida.
-// Os dados vêm do "AppShell" através do useWalletContext — esta página
-// não busca dados sozinha, só decide como exibi-los.
+// frontend/src/pages/DashboardPage.tsx
 
 import pageStyles from "./Page.module.css";
 import { StatsCards } from "../components/StatsCards/StatsCards";
 import { Dashboard } from "../components/Dashboard/Dashboard";
 import { ExportButtons } from "../components/ExportButtons/ExportButtons";
+import { DiversificationCard } from "../components/Diversification/DiversificationCard";
 import { Reveal } from "../components/Reveal/Reveal";
 import { PageHeader } from "../components/PageHeader/PageHeader";
 import { useWalletContext } from "../components/Layout/AppShell";
@@ -26,8 +24,6 @@ export function DashboardPage() {
     <div>
       <PageHeader title="Dashboard" subtitle="Visão geral da sua carteira de investimentos" />
 
-      {/* Sequência natural: primeiro os números (StatsCards), depois o
-          gráfico que os explica visualmente, e por fim a ação de exportar. */}
       <Reveal delay={0}>
         <StatsCards
           investedValue={totals.investedValue}
@@ -42,7 +38,11 @@ export function DashboardPage() {
         <Dashboard stocks={stocks} />
       </Reveal>
 
-      <Reveal delay={0.18} className={pageStyles.sectionGap}>
+      <Reveal delay={0.16} className={pageStyles.sectionGap}>
+        <DiversificationCard stocks={stocks} />
+      </Reveal>
+
+      <Reveal delay={0.2} className={pageStyles.sectionGap}>
         <div className={pageStyles.toolbar}>
           <div className={pageStyles.sectionTitle}>Exportação rápida</div>
         </div>
