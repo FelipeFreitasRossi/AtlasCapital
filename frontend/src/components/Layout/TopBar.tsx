@@ -1,7 +1,4 @@
-// Barra que só aparece em telas pequenas (o CSS cuida de escondê-la no
-// desktop, onde a Sidebar já fica sempre visível). Ela tem o botão de
-// menu (☰) e muda de aparência (fundo mais opaco + linha embaixo)
-// conforme o usuário rola a página — um efeito sutil de profundidade.
+// frontend/src/components/Layout/TopBar.tsx
 
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
@@ -25,7 +22,13 @@ export function TopBar({ onOpenMenu }: TopBarProps) {
   return (
     <header className={`${styles.topBar} ${isScrolled ? styles.topBarScrolled : ""}`}>
       <div className={styles.topBarBrand}>
-        <div className={styles.logo}>AC</div>
+        <div className={styles.logo} style={{ width: 32, height: 32 }}>
+          <img
+            src="https://i.postimg.cc/yWq9jFRD/Atlas-Capital.jpg"
+            alt="AtlasCapital"
+            style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 6 }}
+          />
+        </div>
         AtlasCapital
       </div>
       <button className={styles.menuButton} onClick={onOpenMenu} aria-label="Abrir menu">

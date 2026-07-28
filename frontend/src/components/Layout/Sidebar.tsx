@@ -1,6 +1,16 @@
 // frontend/src/components/Layout/Sidebar.tsx
 
-import { LayoutDashboard, Wallet, FileBarChart, TrendingUp, Wand2, BellRing, X, Plus, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Wallet,
+  FileBarChart,
+  TrendingUp,
+  Wand2,
+  BellRing,
+  X,
+  Plus,
+  LogOut,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import { useAuth } from "../../context/AuthContext";
@@ -39,7 +49,13 @@ export function Sidebar({ isOpen, onClose, onAddStock }: SidebarProps) {
 
       <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}>
         <div className={styles.brand}>
-          <div className={styles.logo}>AC</div>
+          <div className={styles.logo}>
+            <img
+              src="https://i.postimg.cc/yWq9jFRD/Atlas-Capital.jpg"
+              alt="AtlasCapital"
+              className={styles.logoImage}
+            />
+          </div>
           <span className={styles.brandText}>AtlasCapital</span>
           <button className={styles.closeButton} onClick={onClose} aria-label="Fechar menu">
             <X size={20} />

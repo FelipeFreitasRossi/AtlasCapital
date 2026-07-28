@@ -1,7 +1,4 @@
-// Rodapé exibido no final do conteúdo, em todas as páginas (ele mora
-// dentro do AppShell, depois do <Outlet />, então nenhuma página
-// precisa se preocupar em desenhá-lo). Não é "sticky": ele só aparece
-// depois que o conteúdo da página termina, rolando junto com o resto.
+// frontend/src/components/Footer/Footer.tsx
 
 import { FolderGit2, BookOpen, Info, Code2 } from "lucide-react";
 import styles from "./Footer.module.css";
@@ -16,7 +13,13 @@ export function Footer() {
       <div className={styles.inner}>
         <div className={styles.brandColumn}>
           <div className={styles.brand}>
-            <div className={styles.logo}>AC</div>
+            <div className={styles.logo}>
+              <img
+                src="https://i.postimg.cc/yWq9jFRD/Atlas-Capital.jpg"
+                alt="AtlasCapital"
+                className={styles.logoImage}
+              />
+            </div>
             <span className={styles.brandName}>AtlasCapital</span>
           </div>
           <p className={styles.tagline}>

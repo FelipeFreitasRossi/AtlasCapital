@@ -30,7 +30,7 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
         { opacity: 1, scale: 1, rotate: 0, duration: 0.9, ease: "back.out(1.7)" }
       )
       .to(logoRef.current, {
-        boxShadow: "0 0 40px var(--gold-glow)",
+        boxShadow: "0 0 40px rgba(212, 175, 55, 0.3)",
         repeat: -1,
         yoyo: true,
         duration: 1.1,
@@ -53,9 +53,7 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
       onComplete: () => setMinTimeElapsed(true),
     });
 
-    // Fallback: se o GSAP falhar, marca como concluído após o tempo mínimo
     const timer = setTimeout(() => setMinTimeElapsed(true), MIN_DISPLAY_MS + 200);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -73,7 +71,6 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
         handleFinish();
       }
     }, 5000);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -98,7 +95,11 @@ export function SplashScreen({ isDataLoaded, onFinished }: SplashScreenProps) {
     <div className={styles.splash} ref={containerRef}>
       <div className={styles.content}>
         <div className={styles.logoRing} ref={logoRef}>
-          <span className={styles.logoLetters}>AC</span>
+          <img
+            src="https://i.postimg.cc/yWq9jFRD/Atlas-Capital.jpg"
+            alt="AtlasCapital"
+            className={styles.logoImage}
+          />
         </div>
         <div className={styles.brandName}>AtlasCapital</div>
         <div className={styles.progressTrack}>
