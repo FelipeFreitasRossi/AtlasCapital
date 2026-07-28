@@ -2,6 +2,19 @@
 
 import { PageHeader } from "../../components/PageHeader/PageHeader";
 import { Reveal } from "../../components/Reveal/Reveal";
+import {
+  BookOpen,
+  List,
+  PlusCircle,
+  LayoutDashboard,
+  Wallet,
+  FileText,
+  TrendingUp,
+  Wand2,
+  Bell,
+  AlertTriangle,
+  ChevronRight,
+} from "lucide-react";
 import styles from "./DocumentacaoPage.module.css";
 
 export function DocumentacaoPage() {
@@ -14,23 +27,29 @@ export function DocumentacaoPage() {
 
       <Reveal delay={0}>
         <div className={styles.card}>
-          <h2 className={styles.title}>Índice</h2>
+          <h2 className={styles.title}>
+            <List size={20} className={styles.icon} />
+            Índice
+          </h2>
           <ul className={styles.indexList}>
-            <li><a href="#primeiros-passos">1. Primeiros Passos</a></li>
-            <li><a href="#cadastrar-acao">2. Cadastrar uma Ação</a></li>
-            <li><a href="#dashboard">3. Dashboard</a></li>
-            <li><a href="#carteira">4. Minha Carteira</a></li>
-            <li><a href="#relatorios">5. Relatórios</a></li>
-            <li><a href="#previsao">6. Previsão</a></li>
-            <li><a href="#simulacao">7. Simulação</a></li>
-            <li><a href="#alertas">8. Alertas</a></li>
+            <li><a href="#primeiros-passos"><ChevronRight size={14} /> 1. Primeiros Passos</a></li>
+            <li><a href="#cadastrar-acao"><ChevronRight size={14} /> 2. Cadastrar uma Ação</a></li>
+            <li><a href="#dashboard"><ChevronRight size={14} /> 3. Dashboard</a></li>
+            <li><a href="#carteira"><ChevronRight size={14} /> 4. Minha Carteira</a></li>
+            <li><a href="#relatorios"><ChevronRight size={14} /> 5. Relatórios</a></li>
+            <li><a href="#previsao"><ChevronRight size={14} /> 6. Previsão</a></li>
+            <li><a href="#simulacao"><ChevronRight size={14} /> 7. Simulação</a></li>
+            <li><a href="#alertas"><ChevronRight size={14} /> 8. Alertas</a></li>
           </ul>
         </div>
       </Reveal>
 
       <Reveal delay={0.08}>
         <div className={styles.card} id="primeiros-passos">
-          <h2 className={styles.title}>1. Primeiros Passos</h2>
+          <h2 className={styles.title}>
+            <BookOpen size={20} className={styles.icon} />
+            1. Primeiros Passos
+          </h2>
           <p className={styles.text}>
             Para começar a usar o AtlasCapital, você precisa criar uma conta ou fazer login
             com suas credenciais. Após o login, você será direcionado ao Dashboard, onde
@@ -41,7 +60,10 @@ export function DocumentacaoPage() {
 
       <Reveal delay={0.12}>
         <div className={styles.card} id="cadastrar-acao">
-          <h2 className={styles.title}>2. Cadastrar uma Ação</h2>
+          <h2 className={styles.title}>
+            <PlusCircle size={20} className={styles.icon} />
+            2. Cadastrar uma Ação
+          </h2>
           <p className={styles.text}>
             Para adicionar uma nova ação à sua carteira, clique no botão <strong>"Nova Ação"</strong>
             localizado na barra lateral. Preencha os campos obrigatórios:
@@ -62,7 +84,10 @@ export function DocumentacaoPage() {
 
       <Reveal delay={0.16}>
         <div className={styles.card} id="dashboard">
-          <h2 className={styles.title}>3. Dashboard</h2>
+          <h2 className={styles.title}>
+            <LayoutDashboard size={20} className={styles.icon} />
+            3. Dashboard
+          </h2>
           <p className={styles.text}>
             O Dashboard é a página inicial do AtlasCapital. Ela exibe:
           </p>
@@ -77,7 +102,10 @@ export function DocumentacaoPage() {
 
       <Reveal delay={0.2}>
         <div className={styles.card} id="carteira">
-          <h2 className={styles.title}>4. Minha Carteira</h2>
+          <h2 className={styles.title}>
+            <Wallet size={20} className={styles.icon} />
+            4. Minha Carteira
+          </h2>
           <p className={styles.text}>
             A página <strong>"Minha Carteira"</strong> exibe uma tabela completa com todas as suas ações.
             Você pode:
@@ -92,7 +120,10 @@ export function DocumentacaoPage() {
 
       <Reveal delay={0.24}>
         <div className={styles.card} id="relatorios">
-          <h2 className={styles.title}>5. Relatórios</h2>
+          <h2 className={styles.title}>
+            <FileText size={20} className={styles.icon} />
+            5. Relatórios
+          </h2>
           <p className={styles.text}>
             Na página <strong>"Relatórios"</strong>, você pode baixar um resumo completo da sua carteira
             nos formatos:
@@ -110,7 +141,10 @@ export function DocumentacaoPage() {
 
       <Reveal delay={0.28}>
         <div className={styles.card} id="previsao">
-          <h2 className={styles.title}>6. Previsão</h2>
+          <h2 className={styles.title}>
+            <TrendingUp size={20} className={styles.icon} />
+            6. Previsão
+          </h2>
           <p className={styles.text}>
             A ferramenta de <strong>Previsão</strong> utiliza um modelo estatístico (regressão linear)
             para projetar o preço futuro de uma ação com base em dados históricos sintéticos.
@@ -119,15 +153,19 @@ export function DocumentacaoPage() {
             Para usar, selecione uma ação da sua carteira, escolha o horizonte de dias (7, 30 ou 90)
             e clique em <strong>"Prever"</strong>. O gráfico exibirá a projeção com um intervalo de confiança.
           </p>
-          <p className={styles.note}>
-            ⚠️ Esta ferramenta é ilustrativa e não constitui recomendação de investimento.
-          </p>
+          <div className={styles.note}>
+            <AlertTriangle size={16} />
+            Esta ferramenta é ilustrativa e não constitui recomendação de investimento.
+          </div>
         </div>
       </Reveal>
 
       <Reveal delay={0.32}>
         <div className={styles.card} id="simulacao">
-          <h2 className={styles.title}>7. Simulação</h2>
+          <h2 className={styles.title}>
+            <Wand2 size={20} className={styles.icon} />
+            7. Simulação
+          </h2>
           <p className={styles.text}>
             A ferramenta de <strong>Simulação</strong> permite que você visualize o impacto de uma
             compra ou venda hipotética na sua carteira.
@@ -142,7 +180,10 @@ export function DocumentacaoPage() {
 
       <Reveal delay={0.36}>
         <div className={styles.card} id="alertas">
-          <h2 className={styles.title}>8. Alertas</h2>
+          <h2 className={styles.title}>
+            <Bell size={20} className={styles.icon} />
+            8. Alertas
+          </h2>
           <p className={styles.text}>
             Na página <strong>"Alertas"</strong>, você pode criar notificações personalizadas para
             monitorar sua carteira.

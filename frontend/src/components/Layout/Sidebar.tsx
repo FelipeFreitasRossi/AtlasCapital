@@ -10,6 +10,8 @@ import {
   X,
   Plus,
   LogOut,
+  Info,
+  BookOpen,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Sidebar.module.css";
@@ -19,6 +21,8 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onAddStock: () => void;
+  showAddButton?: boolean;
+  showUser?: boolean;
 }
 
 const NAV_ITEMS = [
@@ -28,9 +32,17 @@ const NAV_ITEMS = [
   { to: "/simulacao", label: "Simulação", icon: Wand2, end: false },
   { to: "/alertas", label: "Alertas", icon: BellRing, end: false },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart, end: false },
+  { to: "/sobre", label: "Sobre", icon: Info, end: false },
+  { to: "/documentacao", label: "Documentação", icon: BookOpen, end: false },
 ];
 
-export function Sidebar({ isOpen, onClose, onAddStock }: SidebarProps) {
+export function Sidebar({
+  isOpen,
+  onClose,
+  onAddStock,
+  showAddButton = true,
+  showUser = true,
+}: SidebarProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -41,7 +53,6 @@ export function Sidebar({ isOpen, onClose, onAddStock }: SidebarProps) {
 
   return (
     <>
-      {/* Overlay (mobile) */}
       <div
         className={`${styles.overlay} ${isOpen ? styles.overlayVisible : ""}`}
         onClick={onClose}
@@ -81,12 +92,14 @@ export function Sidebar({ isOpen, onClose, onAddStock }: SidebarProps) {
 
         <div className={styles.spacer} />
 
-        <button className={styles.addButton} onClick={onAddStock}>
-          <Plus size={18} />
-          Nova Ação
-        </button>
+        {showAddButton && (
+          <button className={styles.addButton} onClick={onAddStock}>
+            <Plus size={18} />
+            Nova Ação
+          </button>
+        )}
 
-        {user && (
+        {showUser && user && (
           <div className={styles.userBlock}>
             <div className={styles.userAvatar}>{user.name.charAt(0).toUpperCase()}</div>
             <div className={styles.userInfo}>

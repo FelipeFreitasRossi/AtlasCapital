@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { SplashScreen } from "./components/SplashScreen/SplashScreen";
 import { AppShell } from "./components/Layout/AppShell";
+import { PublicLayout } from "./components/Layout/PublicLayout";
 import { StockForm } from "./components/StockForm/StockForm";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { OnboardingGate } from "./components/Auth/OnboardingGate";
@@ -13,21 +14,22 @@ import { ReportsPage } from "./pages/ReportsPage";
 import { ForecastPage } from "./pages/ForecastPage";
 import { SimulationPage } from "./pages/SimulationPage";
 import { AlertsPage } from "./pages/AlertsPage";
+import { SobrePage } from "./pages/Sobre/SobrePage";
+import { DocumentacaoPage } from "./pages/Documentacao/DocumentacaoPage";
 import { LoginPage } from "./pages/Auth/LoginPage";
 import { RegisterPage } from "./pages/Auth/RegisterPage";
 import { OnboardingPage } from "./pages/Auth/OnboardingPage";
+import { CalendarModal } from "./components/CalendarModal/CalendarModal";
 import { useStocks } from "./hooks/useStocks";
 import { useAuth } from "./context/AuthContext";
 import { pushToast } from "./components/Toast/toastStore";
 import { checkAlerts } from "./services/aiService";
-import { CalendarModal } from "./components/CalendarModal/CalendarModal";
 import type { StockWithMetrics } from "./types/stock";
 
 function App() {
   const { stocks, totals, isLoading, error, saveStock, removeStock, refreshPrices } = useStocks();
   const { isAuthenticated, isCheckingSession } = useAuth();
 
-  // Verificação periódica de alertas
   useEffect(() => {
     if (!isAuthenticated || stocks.length === 0) return;
 
@@ -72,13 +74,13 @@ function App() {
   }
 
   async function handleDelete(stock: StockWithMetrics) {
-    const confirmed = window.confirm(`Apagar a ação ${stock.ticker}?`);
+    const confirmed = window.confirm(`Apagar a ação ${stock.ticker}? Essa ação não pode ser desfeita.`);
     if (confirmed) {
       try {
         await removeStock(stock.id);
         pushToast(`${stock.ticker} removida da carteira.`, "info");
       } catch {
-        pushToast("Não foi possível apagar a ação.", "error");
+        pushToast("Não foi possível apagar a ação. Tente novamente.", "error");
       }
     }
   }
@@ -95,9 +97,15 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/cadastro" element={<RegisterPage />} />
+        {/* Rotas públicas (com layout público: header + footer) */}
+        <Route element={<PublicLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/cadastro" element={<RegisterPage />} />
+          <Route path="/sobre" element={<SobrePage />} />
+          <Route path="/documentacao" element={<DocumentacaoPage />} />
+        </Route>
 
+        {/* Rotas protegidas (exigem login) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/onboarding" element={<OnboardingPage />} />
 
@@ -133,7 +141,6 @@ function App() {
         <StockForm initialData={editingStock} onCancel={closeForm} onSubmit={handleFormSubmit} />
       )}
 
-      {/* Modal global de calendário - sempre no final para ficar acima de tudo */}
       <CalendarModal />
     </>
   );

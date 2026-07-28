@@ -15,6 +15,14 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  color: var(--gold-400);
+  flex-shrink: 0;
 }
 
 .text {
@@ -37,6 +45,15 @@
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.listIcon {
+  color: var(--gold-400);
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .list li strong {
@@ -71,7 +88,9 @@
 }
 
 .githubLink {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 12px;
   padding: 10px 20px;
   background: var(--bg-surface);
