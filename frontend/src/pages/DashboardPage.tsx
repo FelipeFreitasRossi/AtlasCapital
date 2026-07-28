@@ -1,28 +1,54 @@
 // frontend/src/pages/DashboardPage.tsx
 
-import pageStyles from "./Page.module.css";
-import { StatsCards } from "../components/StatsCards/StatsCards";
-import { Dashboard } from "../components/Dashboard/Dashboard";
-import { ExportButtons } from "../components/ExportButtons/ExportButtons";
-import { DiversificationCard } from "../components/Diversification/DiversificationCard";
-import { Reveal } from "../components/Reveal/Reveal";
-import { PageHeader } from "../components/PageHeader/PageHeader";
-import { useWalletContext } from "../components/Layout/AppShell";
+import { useState } from 'react';
+import { RefreshCw } from 'lucide-react';
+import pageStyles from './Page.module.css';
+import { StatsCards } from '../components/StatsCards/StatsCards';
+import { Dashboard } from '../components/Dashboard/Dashboard';
+import { ExportButtons } from '../components/ExportButtons/ExportButtons';
+import { DiversificationCard } from '../components/Diversification/DiversificationCard';
+import { Reveal } from '../components/Reveal/Reveal';
+import { PageHeader } from '../components/PageHeader/PageHeader';
+import { useWalletContext } from '../components/Layout/AppShell';
+import { pushToast } from '../components/Toast/toastStore';
 
 export function DashboardPage() {
-  const { stocks, totals, isLoading, error } = useWalletContext();
+  const { stocks, totals, isLoading, error, refreshPrices } = useWalletContext();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   if (isLoading) {
-    return <div className={pageStyles.loadingState}>Carregando sua carteira...</div>;
+    return <div className={pageStyles.loadingState}>Aguarde...</div>;
   }
 
   if (error) {
     return <div className={pageStyles.errorState}>{error}</div>;
   }
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshPrices();
+      pushToast('Preços atualizados com sucesso!', 'success');
+    } catch {
+      pushToast('Erro ao atualizar preços. Tente novamente.', 'error');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div>
-      <PageHeader title="Dashboard" subtitle="Visão geral da sua carteira de investimentos" />
+      <div className={pageStyles.toolbar}>
+        <PageHeader title="Dashboard" subtitle="Visão geral da sua carteira de investimentos" />
+        <button
+          className={pageStyles.refreshButton}
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+        >
+          <RefreshCw size={16} className={isRefreshing ? pageStyles.spinning : ''} />
+          {isRefreshing ? 'Atualizando...' : 'Atualizar cotações'}
+        </button>
+      </div>
 
       <Reveal delay={0}>
         <StatsCards

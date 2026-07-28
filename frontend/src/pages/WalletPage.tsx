@@ -1,7 +1,6 @@
 // frontend/src/pages/WalletPage.tsx
 
 import { useMemo, useState } from "react";
-import { Search, X } from "lucide-react";
 import pageStyles from "./Page.module.css";
 import filterStyles from "./WalletFilters.module.css";
 import { StockTable } from "../components/StockTable/StockTable";
@@ -38,12 +37,8 @@ export function WalletPage() {
     setDateTo("");
   }
 
-  function clearSearch() {
-    setSearchTerm("");
-  }
-
   if (isLoading) {
-    return <div className={pageStyles.loadingState}>Carregando sua carteira...</div>;
+    return <div className={pageStyles.loadingState}>Aguarde...</div>;
   }
 
   if (error) {
@@ -66,25 +61,13 @@ export function WalletPage() {
             <label className={filterStyles.label} htmlFor="search">
               Ticker ou empresa
             </label>
-            <div className={filterStyles.searchWrapper}>
-              <Search size={16} className={filterStyles.searchIcon} />
-              <input
-                id="search"
-                className={filterStyles.input}
-                placeholder="Ex: PETR4 ou Petrobras"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm && (
-                <button
-                  className={filterStyles.clearSearch}
-                  onClick={clearSearch}
-                  aria-label="Limpar busca"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
+            <input
+              id="search"
+              className={filterStyles.input}
+              placeholder="Ex: PETR4"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
 
           <div className={filterStyles.field}>

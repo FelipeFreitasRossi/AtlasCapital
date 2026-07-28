@@ -1,12 +1,9 @@
 // frontend/src/components/DateField/DateField.tsx
 
-import { DayPicker } from "react-day-picker";
-import { useState, useRef, useEffect } from "react";
 import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { CalendarIcon, X } from "lucide-react";
+import { Calendar } from "lucide-react";
 import styles from "./DateField.module.css";
-import "react-day-picker/style.css";
+import { useCalendar } from "../../context/CalendarContext";
 
 interface DateFieldProps {
   id?: string;
@@ -17,70 +14,26 @@ interface DateFieldProps {
 }
 
 export function DateField({ id, value, onChange, error, placeholder = "Selecione uma data" }: DateFieldProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const { openCalendar } = useCalendar();
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const displayValue = value ? format(parseISO(value), "dd/MM/yyyy") : "";
 
-  const selectedDate = value ? parseISO(value) : undefined;
-
-  const handleSelect = (date: Date | undefined) => {
-    if (date) {
-      onChange(format(date, "yyyy-MM-dd"));
-    } else {
-      onChange("");
-    }
-    setIsOpen(false);
-  };
-
-  const clearDate = () => {
-    onChange("");
-    setIsOpen(false);
+  const handleOpen = () => {
+    openCalendar(value, onChange, placeholder);
   };
 
   return (
-    <div className={styles.wrapper} ref={wrapperRef}>
-      <div className={styles.inputWrapper}>
-        <CalendarIcon size={16} className={styles.calendarIcon} />
-        <input
-          id={id}
-          type="text"
-          className={`${styles.input} ${error ? styles.inputError : ""}`}
-          value={value ? format(parseISO(value), "dd/MM/yyyy") : ""}
-          placeholder={placeholder}
-          onFocus={() => setIsOpen(true)}
-          readOnly
-        />
-        {value && (
-          <button
-            className={styles.clearDate}
-            onClick={clearDate}
-            aria-label="Limpar data"
-            type="button"
-          >
-            <X size={14} />
-          </button>
-        )}
+    <div className={styles.wrapper}>
+      <div
+        className={`${styles.inputWrapper} ${error ? styles.inputError : ""}`}
+        onClick={handleOpen}
+        role="button"
+        tabIndex={0}
+        aria-label="Abrir seletor de data"
+      >
+        <span className={styles.value}>{displayValue || placeholder}</span>
+        <Calendar size={18} className={styles.icon} />
       </div>
-      {isOpen && (
-        <div className={styles.popover}>
-          <DayPicker
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleSelect}
-            locale={ptBR}
-            className={styles.calendar}
-          />
-        </div>
-      )}
       {error && <span className={styles.errorMessage}>{error}</span>}
     </div>
   );

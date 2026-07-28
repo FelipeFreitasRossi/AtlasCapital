@@ -17,7 +17,6 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
-/* ---------- Coluna Marca ---------- */
 .brandColumn {
   display: flex;
   flex-direction: column;
@@ -67,7 +66,6 @@
   max-width: 320px;
 }
 
-/* ---------- Coluna Links ---------- */
 .linksColumn {
   display: flex;
   flex-direction: column;
@@ -98,7 +96,6 @@
   color: var(--gold-400);
 }
 
-/* ---------- Coluna Tecnologias ---------- */
 .techColumn {
   display: flex;
   flex-direction: column;
@@ -129,7 +126,6 @@
   color: var(--gold-400);
 }
 
-/* ---------- Barra inferior ---------- */
 .bottomBar {
   max-width: 1180px;
   margin: 0 auto;
@@ -148,7 +144,6 @@
   opacity: 0.7;
 }
 
-/* ---------- Responsividade ---------- */
 @media (max-width: 860px) {
   .inner {
     grid-template-columns: 1fr 1fr;

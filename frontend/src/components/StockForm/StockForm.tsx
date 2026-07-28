@@ -69,7 +69,13 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
 
   return (
     <div className={styles.overlay} onClick={onCancel}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="stock-form-title">
+      <div
+        className={styles.modal}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="stock-form-title"
+      >
         <div className={styles.header}>
           <div className={styles.title} id="stock-form-title">
             {isEditing ? "Editar ação" : "Nova ação"}
@@ -165,6 +171,7 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
             </div>
           </div>
 
+          {/* Campo de data usando DateField - integrado com o calendário global */}
           <div className={`${styles.field} ${styles.fullWidth}`}>
             <label className={styles.label} htmlFor="purchaseDate">
               Data da compra
@@ -178,6 +185,7 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
                   value={field.value ?? ""}
                   onChange={field.onChange}
                   error={errors.purchaseDate?.message}
+                  placeholder="Selecione a data da compra"
                 />
               )}
             />

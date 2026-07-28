@@ -20,10 +20,11 @@ import { useStocks } from "./hooks/useStocks";
 import { useAuth } from "./context/AuthContext";
 import { pushToast } from "./components/Toast/toastStore";
 import { checkAlerts } from "./services/aiService";
+import { CalendarModal } from "./components/CalendarModal/CalendarModal";
 import type { StockWithMetrics } from "./types/stock";
 
 function App() {
-  const { stocks, totals, isLoading, error, saveStock, removeStock } = useStocks();
+  const { stocks, totals, isLoading, error, saveStock, removeStock, refreshPrices } = useStocks();
   const { isAuthenticated, isCheckingSession } = useAuth();
 
   // Verificação periódica de alertas
@@ -47,9 +48,17 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [editingStock, setEditingStock] = useState<StockWithMetrics | null | undefined>(undefined);
 
-  function openCreateForm() { setEditingStock(null); }
-  function openEditForm(stock: StockWithMetrics) { setEditingStock(stock); }
-  function closeForm() { setEditingStock(undefined); }
+  function openCreateForm() {
+    setEditingStock(null);
+  }
+
+  function openEditForm(stock: StockWithMetrics) {
+    setEditingStock(stock);
+  }
+
+  function closeForm() {
+    setEditingStock(undefined);
+  }
 
   async function handleFormSubmit(data: Parameters<typeof saveStock>[0]) {
     const isEditing = Boolean(editingStock?.id);
@@ -74,7 +83,6 @@ function App() {
     }
   }
 
-  // Se a Splash ainda estiver visível, renderiza ela
   if (showSplash) {
     return (
       <SplashScreen
@@ -105,6 +113,7 @@ function App() {
                     openCreateForm,
                     openEditForm,
                     handleDelete,
+                    refreshPrices,
                   }}
                 />
               }
@@ -123,6 +132,9 @@ function App() {
       {editingStock !== undefined && (
         <StockForm initialData={editingStock} onCancel={closeForm} onSubmit={handleFormSubmit} />
       )}
+
+      {/* Modal global de calendário - sempre no final para ficar acima de tudo */}
+      <CalendarModal />
     </>
   );
 }

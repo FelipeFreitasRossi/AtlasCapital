@@ -1,6 +1,7 @@
 // frontend/src/components/Footer/Footer.tsx
 
 import { FolderGit2, BookOpen, Info, Code2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import styles from "./Footer.module.css";
 
 const TECHNOLOGIES = ["React", "TypeScript", "Vite", "Node.js", "MongoDB", "Python (FastAPI)"];
@@ -29,19 +30,19 @@ export function Footer() {
 
         <div className={styles.linksColumn}>
           <div className={styles.columnTitle}>Links úteis</div>
-          <a className={styles.link} href="#sobre">
+          <Link className={styles.link} to="/sobre">
             <Info size={14} />
             Sobre
-          </a>
-          <a className={styles.link} href="#documentacao">
+          </Link>
+          <Link className={styles.link} to="/documentacao">
             <BookOpen size={14} />
             Documentação
-          </a>
+          </Link>
           <a
             className={styles.link}
-            href="https://github.com/atlascapital/atlascapital"
+            href="https://github.com/FelipeFreitasRossi/AtlasCapital"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             <FolderGit2 size={14} />
             GitHub
