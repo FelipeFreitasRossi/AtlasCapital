@@ -97,10 +97,13 @@ function App() {
   return (
     <>
       <Routes>
-        {/* Rotas públicas (com layout público: header + footer) */}
+        {/* Rotas públicas: Login e Cadastro (SEM HEADER E SEM FOOTER) */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/cadastro" element={<RegisterPage />} />
+
+        {/* Rotas públicas: Sobre e Documentação (COM HEADER E FOOTER) */}
         <Route element={<PublicLayout />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/cadastro" element={<RegisterPage />} />
           <Route path="/sobre" element={<SobrePage />} />
           <Route path="/documentacao" element={<DocumentacaoPage />} />
         </Route>

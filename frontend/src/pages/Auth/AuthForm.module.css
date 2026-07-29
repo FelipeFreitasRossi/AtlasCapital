@@ -1,7 +1,9 @@
+/* frontend/src/pages/Auth/AuthForm.module.css */
+
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .field {
@@ -14,6 +16,7 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
+  letter-spacing: 0.01em;
 }
 
 .inputWrapper {
@@ -28,30 +31,41 @@
   color: var(--text-muted);
   pointer-events: none;
   display: flex;
+  transition: color 0.2s;
 }
 
 .input {
   width: 100%;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 11px 12px 11px 38px;
+  padding: 12px 12px 12px 40px;
   font-size: 14px;
   color: var(--text-primary);
   background: var(--bg-surface);
-  transition: border-color 0.15s ease;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input::placeholder {
   color: var(--text-muted);
 }
 
+.input:hover {
+  border-color: var(--border-strong);
+}
+
 .input:focus {
   border-color: var(--gold-500);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
   outline: none;
 }
 
 .inputError {
   border-color: var(--red-400);
+}
+
+.inputError:focus {
+  border-color: var(--red-400);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
 }
 
 .toggleVisibility {
@@ -64,24 +78,42 @@
   display: flex;
   padding: 6px;
   border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
 }
 
 .toggleVisibility:hover {
   color: var(--text-secondary);
+  background: var(--bg-surface-hover);
 }
 
 .errorMessage {
   font-size: 12px;
   color: var(--red-400);
+  margin-top: 2px;
 }
 
 .formError {
   font-size: 13px;
   color: var(--red-400);
-  background: var(--red-bg);
-  border: 1px solid rgba(255, 107, 107, 0.3);
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.2);
   border-radius: var(--radius-sm);
-  padding: 10px 12px;
+  padding: 10px 14px;
+}
+
+.successMessage {
+  font-size: 13px;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .submitButton {
@@ -90,31 +122,44 @@
   background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
   color: #1a1404;
   border-radius: var(--radius-sm);
-  padding: 12px 18px;
+  padding: 13px 18px;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  transition: filter 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
 }
 
-.submitButton:hover {
+.submitButton:hover:not(:disabled) {
   filter: brightness(1.05);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+  transform: translateY(-1px);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
 }
 
 .submitButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .link {
   color: var(--gold-400);
   font-weight: 600;
   text-decoration: none;
+  transition: color 0.2s;
 }
 
 .link:hover {
+  color: var(--gold-300);
   text-decoration: underline;
 }

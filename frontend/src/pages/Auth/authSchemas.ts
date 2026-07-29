@@ -1,4 +1,4 @@
-// Regras de validação das telas de Login e Cadastro, com Zod.
+// frontend/src/pages/Auth/authSchemas.ts
 
 import { z } from "zod";
 

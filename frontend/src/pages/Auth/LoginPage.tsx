@@ -1,8 +1,10 @@
-import { useState } from "react";
+// frontend/src/pages/Auth/LoginPage.tsx
+
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, LogIn } from "lucide-react";
 import { AuthLayout } from "./AuthLayout";
 import formStyles from "./AuthForm.module.css";
 import { loginSchema } from "./authSchemas";
@@ -16,6 +18,17 @@ export function LoginPage() {
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Verifica se veio uma mensagem de sucesso do cadastro
+  useEffect(() => {
+    const state = location.state as { successMessage?: string } | null;
+    if (state?.successMessage) {
+      setSuccessMessage(state.successMessage);
+      // Limpa o state para não mostrar novamente ao recarregar
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const {
     register,
@@ -28,6 +41,7 @@ export function LoginPage() {
 
   async function onValid(values: LoginFormValues) {
     setFormError(null);
+    setSuccessMessage(null);
     try {
       await login(values);
       const from = (location.state as { from?: string } | null)?.from ?? "/";
@@ -39,18 +53,19 @@ export function LoginPage() {
 
   return (
     <AuthLayout
-      title="Bem-vindo de volta"
-      subtitle="Entre com sua conta para acessar sua carteira de investimentos."
+      title="Acesse sua conta"
+      subtitle="Entre para gerenciar sua carteira de investimentos com segurança."
       footer={
         <span>
-          Ainda não tem conta?{" "}
+          Ainda não tem uma conta?{" "}
           <Link className={formStyles.link} to="/register">
-            Criar conta
+            Cadastre-se
           </Link>
         </span>
       }
     >
       <form className={formStyles.form} onSubmit={handleSubmit(onValid)} noValidate>
+        {successMessage && <div className={formStyles.successMessage}>{successMessage}</div>}
         {formError && <div className={formStyles.formError}>{formError}</div>}
 
         <div className={formStyles.field}>
@@ -59,7 +74,7 @@ export function LoginPage() {
           </label>
           <div className={formStyles.inputWrapper}>
             <span className={formStyles.inputIcon}>
-              <Mail size={16} />
+              <Mail size={18} />
             </span>
             <input
               id="email"
@@ -85,7 +100,7 @@ export function LoginPage() {
           </label>
           <div className={formStyles.inputWrapper}>
             <span className={formStyles.inputIcon}>
-              <Lock size={16} />
+              <Lock size={18} />
             </span>
             <input
               id="password"
@@ -103,7 +118,7 @@ export function LoginPage() {
               onClick={() => setShowPassword((show) => !show)}
               aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
             >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
           {errors.password && (
@@ -114,6 +129,7 @@ export function LoginPage() {
         </div>
 
         <button type="submit" className={formStyles.submitButton} disabled={isSubmitting}>
+          <LogIn size={18} />
           {isSubmitting ? "Entrando..." : "Entrar"}
         </button>
       </form>

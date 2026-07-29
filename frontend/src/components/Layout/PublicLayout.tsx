@@ -17,7 +17,7 @@ export function PublicLayout() {
       <Sidebar
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        onAddStock={() => {}} // função vazia para público
+        onAddStock={() => {}} // função vazia (público não pode adicionar ações)
         showAddButton={false}
         showUser={false}
       />

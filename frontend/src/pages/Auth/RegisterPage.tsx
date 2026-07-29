@@ -1,13 +1,10 @@
-// Tela de cadastro. Ao criar a conta com sucesso, o usuário já entra
-// autenticado (o authService já grava a sessão) e é levado direto
-// para o app — que, por sua vez, vai mostrar o Onboarding, já que é a
-// primeira vez desse usuário.
+// frontend/src/pages/Auth/RegisterPage.tsx
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User, UserPlus } from "lucide-react";
 import { AuthLayout } from "./AuthLayout";
 import formStyles from "./AuthForm.module.css";
 import { registerSchema } from "./authSchemas";
@@ -20,11 +17,12 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
@@ -32,25 +30,32 @@ export function RegisterPage() {
 
   async function onValid(values: RegisterFormValues) {
     setFormError(null);
+    setIsSubmitting(true);
     try {
       await registerUser(values);
-      navigate("/", { replace: true });
+      // Redireciona para login com mensagem de sucesso
+      navigate("/login", {
+        replace: true,
+        state: { successMessage: "Cadastro realizado com sucesso! Faça login para continuar." },
+      });
     } catch (error) {
       setFormError(
-        error instanceof AuthError ? error.message : "Não foi possível criar a conta. Tente novamente.",
+        error instanceof AuthError ? error.message : "Não foi possível criar a conta. Tente novamente."
       );
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   return (
     <AuthLayout
       title="Crie sua conta"
-      subtitle="Leva menos de um minuto para começar a organizar sua carteira."
+      subtitle="Preencha os dados abaixo e comece a organizar sua carteira."
       footer={
         <span>
-          Já tem conta?{" "}
+          Já tem uma conta?{" "}
           <Link className={formStyles.link} to="/login">
-            Entrar
+            Faça login
           </Link>
         </span>
       }
@@ -60,11 +65,11 @@ export function RegisterPage() {
 
         <div className={formStyles.field}>
           <label className={formStyles.label} htmlFor="name">
-            Nome
+            Nome completo
           </label>
           <div className={formStyles.inputWrapper}>
             <span className={formStyles.inputIcon}>
-              <User size={16} />
+              <User size={18} />
             </span>
             <input
               id="name"
@@ -89,7 +94,7 @@ export function RegisterPage() {
           </label>
           <div className={formStyles.inputWrapper}>
             <span className={formStyles.inputIcon}>
-              <Mail size={16} />
+              <Mail size={18} />
             </span>
             <input
               id="email"
@@ -115,14 +120,14 @@ export function RegisterPage() {
           </label>
           <div className={formStyles.inputWrapper}>
             <span className={formStyles.inputIcon}>
-              <Lock size={16} />
+              <Lock size={18} />
             </span>
             <input
               id="password"
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               className={`${formStyles.input} ${errors.password ? formStyles.inputError : ""}`}
-              placeholder="Mínimo de 6 caracteres"
+              placeholder="Mínimo 6 caracteres"
               aria-invalid={Boolean(errors.password)}
               aria-describedby={errors.password ? "password-error" : undefined}
               {...register("password")}
@@ -133,7 +138,7 @@ export function RegisterPage() {
               onClick={() => setShowPassword((show) => !show)}
               aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
             >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
           {errors.password && (
@@ -149,7 +154,7 @@ export function RegisterPage() {
           </label>
           <div className={formStyles.inputWrapper}>
             <span className={formStyles.inputIcon}>
-              <Lock size={16} />
+              <Lock size={18} />
             </span>
             <input
               id="confirmPassword"
@@ -170,6 +175,7 @@ export function RegisterPage() {
         </div>
 
         <button type="submit" className={formStyles.submitButton} disabled={isSubmitting}>
+          <UserPlus size={18} />
           {isSubmitting ? "Criando conta..." : "Criar conta"}
         </button>
       </form>

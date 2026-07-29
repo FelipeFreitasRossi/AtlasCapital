@@ -1,8 +1,13 @@
+/* frontend/src/pages/Auth/AuthLayout.module.css */
+
 .screen {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1.05fr 1fr;
-  background: var(--bg-base);
+  background: #0b1119;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.07), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(34, 184, 201, 0.05), transparent 40%);
 }
 
 .panelBrand {
@@ -10,12 +15,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 28px;
+  gap: 32px;
   padding: 56px 64px;
-  background: linear-gradient(160deg, var(--bg-elevated), var(--bg-base));
-  background-image: radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.1), transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(34, 184, 201, 0.08), transparent 40%);
-  border-right: 1px solid var(--border-subtle);
+  background: linear-gradient(160deg, rgba(20, 28, 38, 0.92), rgba(11, 17, 25, 0.95));
+  backdrop-filter: blur(2px);
+  border-right: 1px solid rgba(42, 58, 74, 0.3);
 }
 
 .brand {
@@ -25,26 +29,32 @@
 }
 
 .logo {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 10px;
   background: linear-gradient(160deg, var(--bg-surface), var(--bg-elevated));
   border: 1px solid var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 14px;
-  color: var(--gold-400);
   flex-shrink: 0;
+  overflow: hidden;
+  padding: 4px;
+}
+
+.logoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
 }
 
 .brandName {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 18px;
+  font-size: 20px;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .brandTitle {
@@ -54,6 +64,7 @@
   font-weight: 700;
   color: var(--text-primary);
   max-width: 420px;
+  margin-top: 4px;
 }
 
 .highlights {
@@ -62,20 +73,21 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .highlightItem {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   color: var(--text-secondary);
   font-size: 14px;
+  line-height: 1.4;
 }
 
 .highlightIcon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
@@ -84,6 +96,14 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.brandFooter {
+  margin-top: auto;
+  padding-top: 32px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .panelForm {
@@ -102,12 +122,12 @@
   display: none;
   align-items: center;
   gap: 10px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .title {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 6px;
@@ -121,7 +141,7 @@
 }
 
 .footer {
-  margin-top: 20px;
+  margin-top: 24px;
   text-align: center;
   font-size: 13px;
   color: var(--text-secondary);
@@ -136,5 +156,17 @@
   }
   .mobileBrand {
     display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .panelForm {
+    padding: 24px 16px;
+  }
+  .formCard {
+    max-width: 100%;
+  }
+  .title {
+    font-size: 22px;
   }
 }

@@ -115,4 +115,13 @@
   .card {
     padding: 18px 16px;
   }
+  .title {
+    font-size: 16px;
+  }
+  .text {
+    font-size: 13px;
+  }
+  .list li {
+    font-size: 13px;
+  }
 }
