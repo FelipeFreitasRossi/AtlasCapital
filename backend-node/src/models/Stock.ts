@@ -9,9 +9,10 @@ export interface IStock extends Document {
   buyPrice: number;
   currentPrice: number;
   purchaseDate: string;
-  lastUpdated: Date;
-  previousClose?: number;
-  changePercent?: number;
+  userId: string;          // 👈 referência ao usuário
+  lastUpdated: Date;       // 👈 para controle de atualização
+  previousClose?: number;  // 👈 preço de fechamento anterior
+  changePercent?: number;  // 👈 variação percentual
 }
 
 const StockSchema = new Schema<IStock>(
@@ -22,13 +23,12 @@ const StockSchema = new Schema<IStock>(
     buyPrice: { type: Number, required: true, min: 0.01 },
     currentPrice: { type: Number, required: true, min: 0.01 },
     purchaseDate: { type: String, required: true },
+    userId: { type: String, required: true },
     lastUpdated: { type: Date, default: Date.now },
     previousClose: { type: Number },
     changePercent: { type: Number },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export default mongoose.model<IStock>('Stock', StockSchema);

@@ -2,29 +2,29 @@
 
 import { Router } from 'express';
 import Stock from '../models/Stock';
-import { getQuote, refreshAllPrices } from '../services/marketService';
+import { getQuote } from '../services/marketService';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
-// GET /stocks - Listar todas as ações
+// Todas as rotas de stock exigem autenticação
+router.use(authenticate);
+
 router.get('/stocks', async (req, res) => {
   try {
-    const stocks = await Stock.find().sort({ createdAt: -1 });
+    const stocks = await Stock.find({ userId: req.userId }).sort({ createdAt: -1 });
     res.json(stocks);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar ações' });
   }
 });
 
-// POST /stocks - Criar nova ação (com cotação real)
 router.post('/stocks', async (req, res) => {
   try {
     const { ticker, name, quantity, buyPrice, purchaseDate } = req.body;
-
     if (!ticker || !quantity || !buyPrice || !purchaseDate) {
-      return res.status(400).json({ error: 'Campos obrigatórios: ticker, quantity, buyPrice, purchaseDate' });
+      return res.status(400).json({ error: 'Campos obrigatórios.' });
     }
-
     const quote = await getQuote(ticker);
     const currentPrice = quote?.currentPrice ?? buyPrice;
     const companyName = quote?.name ?? name ?? ticker;
@@ -39,6 +39,7 @@ router.post('/stocks', async (req, res) => {
       lastUpdated: new Date(),
       previousClose: quote?.previousClose ?? currentPrice,
       changePercent: quote?.changePercent ?? 0,
+      userId: req.userId,
     });
 
     const saved = await newStock.save();
@@ -49,13 +50,12 @@ router.post('/stocks', async (req, res) => {
   }
 });
 
-// PUT /stocks/:id - Atualizar ação (atualiza também a cotação)
 router.put('/stocks/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { ticker, name, quantity, buyPrice, purchaseDate } = req.body;
 
-    const stock = await Stock.findById(id);
+    const stock = await Stock.findOne({ _id: id, userId: req.userId });
     if (!stock) {
       return res.status(404).json({ error: 'Ação não encontrada' });
     }
@@ -82,11 +82,10 @@ router.put('/stocks/:id', async (req, res) => {
   }
 });
 
-// DELETE /stocks/:id - Deletar ação
 router.delete('/stocks/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Stock.findByIdAndDelete(id);
+    const deleted = await Stock.findOneAndDelete({ _id: id, userId: req.userId });
     if (!deleted) {
       return res.status(404).json({ error: 'Ação não encontrada' });
     }
@@ -96,15 +95,22 @@ router.delete('/stocks/:id', async (req, res) => {
   }
 });
 
-// POST /stocks/refresh - Atualizar preços de todas as ações
 router.post('/stocks/refresh', async (req, res) => {
   try {
-    const result = await refreshAllPrices();
-    res.json({
-      message: `${result.updated} ações atualizadas`,
-      updated: result.updated,
-      failed: result.failed,
-    });
+    const stocks = await Stock.find({ userId: req.userId });
+    const updated: string[] = [];
+    for (const stock of stocks) {
+      const quote = await getQuote(stock.ticker);
+      if (quote) {
+        stock.currentPrice = quote.currentPrice;
+        stock.previousClose = quote.previousClose;
+        stock.changePercent = quote.changePercent;
+        stock.lastUpdated = new Date();
+        await stock.save();
+        updated.push(stock.ticker);
+      }
+    }
+    res.json({ message: `${updated.length} ações atualizadas`, updated });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Erro ao atualizar preços' });

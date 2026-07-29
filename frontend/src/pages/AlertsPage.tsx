@@ -1,7 +1,7 @@
 // frontend/src/pages/AlertsPage.tsx
 
 import { useEffect, useState } from "react";
-import { Bell, BellRing, RefreshCw, Trash2, AlertTriangle, TrendingUp, TrendingDown, DollarSign, PieChart } from "lucide-react";
+import { Bell, BellRing, RefreshCw, Trash2, TrendingUp, TrendingDown, PieChart } from "lucide-react";
 import styles from "./AlertsPage.module.css";
 import { PageHeader } from "../components/PageHeader/PageHeader";
 import { Reveal } from "../components/Reveal/Reveal";
@@ -53,7 +53,6 @@ export function AlertsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Opções para o seletor de ativos
   const stockOptions = stocks.map((s) => ({
     value: s.ticker,
     label: `${s.ticker} - ${s.name}`,
@@ -137,7 +136,6 @@ export function AlertsPage() {
           <div className={styles.formCard}>
             <div className={styles.cardTitle}>Novo alerta</div>
 
-            {/* Tipo de Alerta */}
             <div className={styles.field}>
               <label className={styles.label}>Tipo de alerta</label>
               <ModalSelector
@@ -148,7 +146,6 @@ export function AlertsPage() {
               />
             </div>
 
-            {/* Ativo (se não for patrimônio) */}
             {type !== "portfolio_value_above" && (
               <div className={styles.field}>
                 <label className={styles.label}>Ativo</label>
@@ -161,7 +158,6 @@ export function AlertsPage() {
               </div>
             )}
 
-            {/* Campos específicos por tipo */}
             {type === "price_drop_percent" && (
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="alert-percent">

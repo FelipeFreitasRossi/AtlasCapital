@@ -1,19 +1,19 @@
 // frontend/src/components/DateField/DateField.tsx
 
+import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { Calendar } from "lucide-react";
 import styles from "./DateField.module.css";
 import { useCalendar } from "../../context/CalendarContext";
 
 interface DateFieldProps {
-  id?: string;
   value: string;
   onChange: (value: string) => void;
   error?: string;
   placeholder?: string;
 }
 
-export function DateField({ id, value, onChange, error, placeholder = "Selecione uma data" }: DateFieldProps) {
+export function DateField({ value, onChange, error, placeholder = "Selecione uma data" }: DateFieldProps) {
   const { openCalendar } = useCalendar();
 
   const displayValue = value ? format(parseISO(value), "dd/MM/yyyy") : "";

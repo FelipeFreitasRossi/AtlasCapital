@@ -20,14 +20,16 @@ export function LoginPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Verifica se veio uma mensagem de sucesso do cadastro
   useEffect(() => {
     const state = location.state as { successMessage?: string } | null;
     if (state?.successMessage) {
       setSuccessMessage(state.successMessage);
-      // Limpa o state para não mostrar novamente ao recarregar
       window.history.replaceState({}, document.title);
     }
+    // Verifica se já está autenticado e redireciona
+    const token = localStorage.getItem('atlascapital:token');
+    const session = localStorage.getItem('atlascapital:session');
+    console.log('[LoginPage] Token:', token, 'Sessão:', session);
   }, [location]);
 
   const {
@@ -42,11 +44,14 @@ export function LoginPage() {
   async function onValid(values: LoginFormValues) {
     setFormError(null);
     setSuccessMessage(null);
+    console.log('[LoginPage] Tentando login com:', values.email);
     try {
       await login(values);
+      console.log('[LoginPage] Login bem-sucedido, redirecionando para /');
       const from = (location.state as { from?: string } | null)?.from ?? "/";
       navigate(from, { replace: true });
     } catch (error) {
+      console.error('[LoginPage] Erro no login:', error);
       setFormError(error instanceof AuthError ? error.message : "Não foi possível entrar. Tente novamente.");
     }
   }
@@ -82,16 +87,10 @@ export function LoginPage() {
               autoComplete="email"
               className={`${formStyles.input} ${errors.email ? formStyles.inputError : ""}`}
               placeholder="voce@email.com"
-              aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? "email-error" : undefined}
               {...register("email")}
             />
           </div>
-          {errors.email && (
-            <span id="email-error" className={formStyles.errorMessage}>
-              {errors.email.message}
-            </span>
-          )}
+          {errors.email && <span className={formStyles.errorMessage}>{errors.email.message}</span>}
         </div>
 
         <div className={formStyles.field}>
@@ -108,8 +107,6 @@ export function LoginPage() {
               autoComplete="current-password"
               className={`${formStyles.input} ${errors.password ? formStyles.inputError : ""}`}
               placeholder="Sua senha"
-              aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? "password-error" : undefined}
               {...register("password")}
             />
             <button
@@ -121,11 +118,7 @@ export function LoginPage() {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          {errors.password && (
-            <span id="password-error" className={formStyles.errorMessage}>
-              {errors.password.message}
-            </span>
-          )}
+          {errors.password && <span className={formStyles.errorMessage}>{errors.password.message}</span>}
         </div>
 
         <button type="submit" className={formStyles.submitButton} disabled={isSubmitting}>

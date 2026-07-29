@@ -1,7 +1,7 @@
 // frontend/src/pages/Auth/AuthLayout.tsx
 
 import type { ReactNode } from "react";
-import { LineChart, ShieldCheck, Sparkles, TrendingUp, FileText, Bell } from "lucide-react";
+import { LineChart, ShieldCheck, TrendingUp, FileText, Bell } from "lucide-react";
 import styles from "./AuthLayout.module.css";
 
 interface AuthLayoutProps {

@@ -3,27 +3,28 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import cron from 'node-cron';
+import dotenv from 'dotenv';
 import stockRoutes from './routes/stockRoutes';
+import authRoutes from './routes/authRoutes';
+import cron from 'node-cron';
 import { refreshAllPrices } from './services/marketService';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Conectar ao MongoDB
 mongoose
-  .connect('mongodb://localhost:27017/atlascapital')
+  .connect(process.env.MONGO_URI || 'mongodb://localhost:27017/atlascapital')
   .then(() => console.log('✅ Conectado ao MongoDB'))
   .catch((err) => console.error('❌ Erro ao conectar ao MongoDB:', err));
 
-// Rotas
+app.use('/api/auth', authRoutes);
 app.use('/api', stockRoutes);
 
-// Cron job: atualiza preços a cada 30 minutos (opcional)
 cron.schedule('*/30 * * * *', async () => {
   console.log('🔄 Atualizando cotações automaticamente...');
   try {

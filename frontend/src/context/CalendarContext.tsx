@@ -1,6 +1,6 @@
 // frontend/src/context/CalendarContext.tsx
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
 interface CalendarState {
   isOpen: boolean;

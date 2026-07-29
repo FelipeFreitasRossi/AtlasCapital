@@ -1,12 +1,16 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useOnboarding } from "../../hooks/useOnboarding";
 
 export function OnboardingGate() {
-  const { hasSeenOnboarding } = useAuth();
+  const { hasSeenOnboarding } = useOnboarding();
+
+  console.log('[OnboardingGate] hasSeenOnboarding =', hasSeenOnboarding);
 
   if (!hasSeenOnboarding) {
+    console.log('[OnboardingGate] Redirecionando para /onboarding');
     return <Navigate to="/onboarding" replace />;
   }
 
+  console.log('[OnboardingGate] Permitindo acesso à rota protegida');
   return <Outlet />;
 }

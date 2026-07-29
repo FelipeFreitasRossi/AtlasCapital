@@ -1,5 +1,3 @@
-// frontend/src/components/Layout/PublicLayout.tsx
-
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
@@ -17,7 +15,7 @@ export function PublicLayout() {
       <Sidebar
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        onAddStock={() => {}} // função vazia (público não pode adicionar ações)
+        onAddStock={() => {}}
         showAddButton={false}
         showUser={false}
       />

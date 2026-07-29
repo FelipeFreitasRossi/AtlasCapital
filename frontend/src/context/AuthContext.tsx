@@ -1,5 +1,3 @@
-// frontend/src/context/AuthContext.tsx
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { authService } from "../services/authService";
 import type { User, LoginInput, RegisterInput } from "../types/auth";
@@ -8,11 +6,9 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isCheckingSession: boolean;
-  hasSeenOnboarding: boolean;
   login: (data: LoginInput) => Promise<void>;
   register: (data: RegisterInput) => Promise<void>;
   logout: () => void;
-  markOnboardingAsSeen: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,68 +16,52 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
-
-  const checkOnboardingStatus = (userId: string) => {
-    const key = `atlascapital:onboarding_seen:${userId}`;
-    setHasSeenOnboarding(localStorage.getItem(key) === "true");
-  };
 
   useEffect(() => {
-    const loadSession = async () => {
+    const loadUser = async () => {
+      console.log("[AuthContext] Iniciando verificação de sessão...");
       try {
         const currentUser = await authService.getCurrentUser();
-        if (currentUser) {
-          setUser(currentUser);
-          checkOnboardingStatus(currentUser.id);
-        }
+        console.log("[AuthContext] Usuário carregado:", currentUser);
+        setUser(currentUser);
       } catch (error) {
-        console.error("Erro ao restaurar sessão:", error);
+        console.error("[AuthContext] Erro ao carregar usuário:", error);
+        setUser(null);
       } finally {
+        console.log("[AuthContext] Verificação concluída. Autenticado:", !!user);
         setIsCheckingSession(false);
       }
     };
-    loadSession();
+    loadUser();
   }, []);
 
   const login = async (data: LoginInput) => {
     const loggedUser = await authService.login(data);
+    console.log("[AuthContext] Login bem-sucedido:", loggedUser);
     setUser(loggedUser);
-    checkOnboardingStatus(loggedUser.id);
   };
 
   const register = async (data: RegisterInput) => {
     const newUser = await authService.register(data);
+    console.log("[AuthContext] Registro bem-sucedido:", newUser);
     setUser(newUser);
-    checkOnboardingStatus(newUser.id);
   };
 
   const logout = () => {
     authService.logout();
     setUser(null);
-    setHasSeenOnboarding(false);
-  };
-
-  const markOnboardingAsSeen = () => {
-    if (user?.id) {
-      localStorage.setItem(`atlascapital:onboarding_seen:${user.id}`, "true");
-      setHasSeenOnboarding(true);
-    } else {
-      localStorage.setItem("atlascapital:onboarding_seen", "true");
-      setHasSeenOnboarding(true);
-    }
   };
 
   const value = {
     user,
     isAuthenticated: !!user,
     isCheckingSession,
-    hasSeenOnboarding,
     login,
     register,
     logout,
-    markOnboardingAsSeen,
   };
+
+  console.log("[AuthContext] Estado atual:", value);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -89,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

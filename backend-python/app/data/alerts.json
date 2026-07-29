@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "type": "price_drop_percent",
+    "ticker": "ITSA4",
+    "thresholdPercent": 5.0,
+    "thresholdPrice": null,
+    "thresholdValue": null,
+    "id": "cd52c62b",
+    "createdAt": "2026-07-29T00:25:04.329132",
+    "triggered": false,
+    "triggeredAt": null,
+    "message": null
+  },
+  {
+    "type": "price_drop_percent",
+    "ticker": "ITSA4",
+    "thresholdPercent": 5.0,
+    "thresholdPrice": null,
+    "thresholdValue": null,
+    "id": "6e7bb370",
+    "createdAt": "2026-07-29T01:40:55.745953",
+    "triggered": false,
+    "triggeredAt": null,
+    "message": null
+  }
+]

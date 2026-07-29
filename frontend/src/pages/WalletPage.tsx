@@ -70,24 +70,24 @@ export function WalletPage() {
             />
           </div>
 
+          {/* COMPRADO A PARTIR DE - usando DateField sem id */}
           <div className={filterStyles.field}>
             <label className={filterStyles.label} htmlFor="dateFrom">
               Comprado a partir de
             </label>
             <DateField
-              id="dateFrom"
               value={dateFrom}
               onChange={setDateFrom}
               placeholder="Data inicial"
             />
           </div>
 
+          {/* COMPRADO ATÉ - usando DateField sem id */}
           <div className={filterStyles.field}>
             <label className={filterStyles.label} htmlFor="dateTo">
               Comprado até
             </label>
             <DateField
-              id="dateTo"
               value={dateTo}
               onChange={setDateTo}
               placeholder="Data final"

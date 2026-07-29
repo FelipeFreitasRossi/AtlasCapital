@@ -17,9 +17,18 @@ interface StockFormProps {
 const stockSchema = z.object({
   ticker: z.string().trim().min(1, "Informe o ticker."),
   name: z.string().trim().min(1, "Informe o nome da empresa."),
-  quantity: z.number({ error: "Informe uma quantidade válida." }).positive("A quantidade deve ser maior que zero."),
-  buyPrice: z.number({ error: "Informe um preço de compra válido." }).positive("O preço de compra deve ser maior que zero."),
-  currentPrice: z.number({ error: "Informe um preço atual válido." }).positive("O preço atual deve ser maior que zero."),
+  quantity: z
+    .number()
+    .positive("A quantidade deve ser maior que zero.")
+    .refine((val) => !isNaN(val), "Informe uma quantidade válida."),
+  buyPrice: z
+    .number()
+    .positive("O preço de compra deve ser maior que zero.")
+    .refine((val) => !isNaN(val), "Informe um preço de compra válido."),
+  currentPrice: z
+    .number()
+    .positive("O preço atual deve ser maior que zero.")
+    .refine((val) => !isNaN(val), "Informe um preço atual válido."),
   purchaseDate: z.string().min(1, "Informe a data da compra."),
 });
 
@@ -171,17 +180,13 @@ export function StockForm({ initialData, onCancel, onSubmit }: StockFormProps) {
             </div>
           </div>
 
-          {/* Campo de data usando DateField - integrado com o calendário global */}
           <div className={`${styles.field} ${styles.fullWidth}`}>
-            <label className={styles.label} htmlFor="purchaseDate">
-              Data da compra
-            </label>
+            <label className={styles.label}>Data da compra</label>
             <Controller
               name="purchaseDate"
               control={control}
               render={({ field }) => (
                 <DateField
-                  id="purchaseDate"
                   value={field.value ?? ""}
                   onChange={field.onChange}
                   error={errors.purchaseDate?.message}

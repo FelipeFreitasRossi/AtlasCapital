@@ -16,20 +16,24 @@ export interface StockQuote {
 
 export async function getQuote(ticker: string): Promise<StockQuote | null> {
   try {
-    // Yahoo Finance espera o ticker com sufixo .SA para ações brasileiras
     const symbols = [ticker, `${ticker}.SA`];
 
     for (const symbol of symbols) {
       try {
-        const quote = await yahooFinance.quote(symbol);
-        if (quote && quote.regularMarketPrice) {
+        // Usamos 'any' para evitar problemas de tipo com a biblioteca
+        const quote: any = await yahooFinance.quote(symbol);
+
+        if (quote && typeof quote.regularMarketPrice === 'number') {
+          const price = quote.regularMarketPrice;
+          const previousClose = quote.regularMarketPreviousClose || price;
+
           return {
             ticker: ticker.toUpperCase(),
             name: quote.longName || quote.shortName || ticker,
-            currentPrice: quote.regularMarketPrice,
-            previousClose: quote.regularMarketPreviousClose || quote.regularMarketPrice,
-            change: (quote.regularMarketPrice - (quote.regularMarketPreviousClose || quote.regularMarketPrice)),
-            changePercent: (quote.regularMarketPrice / (quote.regularMarketPreviousClose || quote.regularMarketPrice)) - 1,
+            currentPrice: price,
+            previousClose: previousClose,
+            change: price - previousClose,
+            changePercent: (price / previousClose) - 1,
             marketCap: quote.marketCap,
             volume: quote.regularMarketVolume,
           };
@@ -48,23 +52,28 @@ export async function getQuote(ticker: string): Promise<StockQuote | null> {
 }
 
 export async function refreshAllPrices(): Promise<{ updated: number; failed: string[] }> {
-  const stocks = await Stock.find();
-  let updated = 0;
-  const failed: string[] = [];
+  try {
+    const stocks = await Stock.find();
+    let updated = 0;
+    const failed: string[] = [];
 
-  for (const stock of stocks) {
-    const quote = await getQuote(stock.ticker);
-    if (quote) {
-      stock.currentPrice = quote.currentPrice;
-      stock.previousClose = quote.previousClose;
-      stock.changePercent = quote.changePercent;
-      stock.lastUpdated = new Date();
-      await stock.save();
-      updated++;
-    } else {
-      failed.push(stock.ticker);
+    for (const stock of stocks) {
+      const quote = await getQuote(stock.ticker);
+      if (quote) {
+        stock.currentPrice = quote.currentPrice;
+        stock.previousClose = quote.previousClose;
+        stock.changePercent = quote.changePercent;
+        stock.lastUpdated = new Date();
+        await stock.save();
+        updated++;
+      } else {
+        failed.push(stock.ticker);
+      }
     }
-  }
 
-  return { updated, failed };
+    return { updated, failed };
+  } catch (error) {
+    console.error('Erro ao atualizar preços:', error);
+    return { updated: 0, failed: [] };
+  }
 }
