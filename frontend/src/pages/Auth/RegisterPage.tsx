@@ -31,14 +31,17 @@ export function RegisterPage() {
   async function onValid(values: RegisterFormValues) {
     setFormError(null);
     setIsSubmitting(true);
+    console.log('[RegisterPage] Tentando registrar:', values.email);
+    
     try {
-      await registerUser(values);
-      // Redireciona para login com mensagem de sucesso
-      navigate("/login", {
-        replace: true,
-        state: { successMessage: "Cadastro realizado com sucesso! Faça login para continuar." },
-      });
+      const user = await registerUser(values);
+      console.log('[RegisterPage] Registro bem-sucedido:', user);
+      
+      // O token já foi salvo no authService.register
+      // Redireciona para o Dashboard
+      navigate("/", { replace: true });
     } catch (error) {
+      console.error('[RegisterPage] Erro no registro:', error);
       setFormError(
         error instanceof AuthError ? error.message : "Não foi possível criar a conta. Tente novamente."
       );
@@ -77,14 +80,11 @@ export function RegisterPage() {
               className={`${formStyles.input} ${errors.name ? formStyles.inputError : ""}`}
               placeholder="Seu nome completo"
               aria-invalid={Boolean(errors.name)}
-              aria-describedby={errors.name ? "name-error" : undefined}
               {...register("name")}
             />
           </div>
           {errors.name && (
-            <span id="name-error" className={formStyles.errorMessage}>
-              {errors.name.message}
-            </span>
+            <span className={formStyles.errorMessage}>{errors.name.message}</span>
           )}
         </div>
 
@@ -103,14 +103,11 @@ export function RegisterPage() {
               className={`${formStyles.input} ${errors.email ? formStyles.inputError : ""}`}
               placeholder="voce@email.com"
               aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? "email-error" : undefined}
               {...register("email")}
             />
           </div>
           {errors.email && (
-            <span id="email-error" className={formStyles.errorMessage}>
-              {errors.email.message}
-            </span>
+            <span className={formStyles.errorMessage}>{errors.email.message}</span>
           )}
         </div>
 
@@ -129,7 +126,6 @@ export function RegisterPage() {
               className={`${formStyles.input} ${errors.password ? formStyles.inputError : ""}`}
               placeholder="Mínimo 6 caracteres"
               aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? "password-error" : undefined}
               {...register("password")}
             />
             <button
@@ -142,9 +138,7 @@ export function RegisterPage() {
             </button>
           </div>
           {errors.password && (
-            <span id="password-error" className={formStyles.errorMessage}>
-              {errors.password.message}
-            </span>
+            <span className={formStyles.errorMessage}>{errors.password.message}</span>
           )}
         </div>
 
@@ -163,14 +157,11 @@ export function RegisterPage() {
               className={`${formStyles.input} ${errors.confirmPassword ? formStyles.inputError : ""}`}
               placeholder="Repita a senha"
               aria-invalid={Boolean(errors.confirmPassword)}
-              aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
               {...register("confirmPassword")}
             />
           </div>
           {errors.confirmPassword && (
-            <span id="confirmPassword-error" className={formStyles.errorMessage}>
-              {errors.confirmPassword.message}
-            </span>
+            <span className={formStyles.errorMessage}>{errors.confirmPassword.message}</span>
           )}
         </div>
 
