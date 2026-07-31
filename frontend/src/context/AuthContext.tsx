@@ -1,3 +1,5 @@
+// frontend/src/context/AuthContext.tsx
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { authService } from "../services/authService";
 import type { User, LoginInput, RegisterInput } from "../types/auth";
@@ -19,31 +21,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const loadUser = async () => {
-      console.log("[AuthContext] Iniciando verificação de sessão...");
       try {
         const currentUser = await authService.getCurrentUser();
-        console.log("[AuthContext] Usuário carregado:", currentUser);
+        console.log('[AuthContext] Usuário carregado:', currentUser);
         setUser(currentUser);
       } catch (error) {
-        console.error("[AuthContext] Erro ao carregar usuário:", error);
+        console.error('[AuthContext] Erro ao carregar usuário:', error);
         setUser(null);
       } finally {
-        console.log("[AuthContext] Verificação concluída. Autenticado:", !!user);
         setIsCheckingSession(false);
+        console.log('[AuthContext] Verificação concluída. Autenticado:', !!user);
       }
     };
     loadUser();
   }, []);
 
   const login = async (data: LoginInput) => {
+    console.log('[AuthContext] login chamado com:', data.email);
     const loggedUser = await authService.login(data);
-    console.log("[AuthContext] Login bem-sucedido:", loggedUser);
+    console.log('[AuthContext] Usuário logado:', loggedUser);
     setUser(loggedUser);
   };
 
   const register = async (data: RegisterInput) => {
+    console.log('[AuthContext] register chamado com:', data.email);
     const newUser = await authService.register(data);
-    console.log("[AuthContext] Registro bem-sucedido:", newUser);
+    console.log('[AuthContext] Usuário registrado:', newUser);
     setUser(newUser);
   };
 
@@ -61,15 +64,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
   };
 
-  console.log("[AuthContext] Estado atual:", value);
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   return context;
 }
