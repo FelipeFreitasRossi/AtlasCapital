@@ -31,13 +31,13 @@
 
 .tableWrapper {
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* rolagem suave em iOS */
+  -webkit-overflow-scrolling: touch;
   padding: 0 4px 4px 4px;
 }
 
 .table {
   width: 100%;
-  min-width: 640px; /* garante que a tabela tenha largura mínima para scroll horizontal */
+  min-width: 640px;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -86,8 +86,6 @@
   color: var(--red-400);
 }
 
-/* Responsividade: em telas pequenas, reduzimos padding e font-size,
-   e o wrapper já garante o scroll horizontal */
 @media (max-width: 640px) {
   .previewHeader {
     padding: 16px 16px 4px;
