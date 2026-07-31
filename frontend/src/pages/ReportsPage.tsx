@@ -1,7 +1,9 @@
 // frontend/src/pages/ReportsPage.tsx
+// ReportsPage.tsx - com estilos de pré-visualização
 
 import pageStyles from "./Page.module.css";
 import previewStyles from "./ReportsPreview.module.css";
+
 import { ExportButtons } from "../components/ExportButtons/ExportButtons";
 import { Reveal } from "../components/Reveal/Reveal";
 import { useWalletContext } from "../components/Layout/AppShell";
