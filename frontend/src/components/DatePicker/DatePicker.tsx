@@ -1,16 +1,3 @@
-// Campo de data reutilizável, usado no StockForm no lugar do
-// <input type="date"> nativo (que tem visual inconsistente entre
-// navegadores e é pouco amigável no toque).
-//
-// - O campo em si mostra a data já formatada como DD/MM/AAAA.
-// - Ao ser tocado/clicado, abre um calendário (react-day-picker):
-//     - Em telas largas, um "popover" ancorado embaixo do campo.
-//     - Em mobile, uma gaveta (drawer) que sobe do rodapé, ocupando a
-//       largura toda — mais fácil de tocar com o dedo.
-// - Por fora, o componente sempre trabalha com uma string no formato
-//   "AAAA-MM-DD" (o mesmo formato que o backend espera), então quem
-//   usa <DatePicker> não precisa se preocupar em converter nada.
-
 import { useEffect, useId, useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { ptBR } from "date-fns/locale"; 

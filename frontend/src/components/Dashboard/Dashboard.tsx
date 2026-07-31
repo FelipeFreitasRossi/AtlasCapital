@@ -1,13 +1,3 @@
-// Este componente desenha o gráfico de barras: uma barra para cada
-// ação, mostrando o lucro (verde) ou prejuízo (vermelho) dela.
-//
-// Novidade desta versão: as barras só "crescem" quando o gráfico entra
-// na área visível da tela (viewport), em vez de crescerem assim que a
-// página carrega escondidas lá embaixo. Pra isso, usamos o GSAP
-// ScrollTrigger só pra DETECTAR o momento em que o usuário rolou até
-// aqui — quem realmente anima o crescimento das barras é o próprio
-// Recharts (ele já faz isso sozinho quando o gráfico "nasce" na tela).
-
 import { useEffect, useRef, useState } from "react";
 import {
   Bar,

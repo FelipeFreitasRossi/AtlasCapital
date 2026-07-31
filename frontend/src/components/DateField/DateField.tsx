@@ -1,6 +1,5 @@
 // frontend/src/components/DateField/DateField.tsx
 
-import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { Calendar } from "lucide-react";
 import styles from "./DateField.module.css";

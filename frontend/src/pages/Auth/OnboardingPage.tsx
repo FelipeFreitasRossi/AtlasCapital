@@ -1,8 +1,7 @@
 // frontend/src/pages/Auth/OnboardingPage.tsx
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useOnboarding } from "../../hooks/useOnboarding";
 import { LineChart, Wallet, FileBarChart } from "lucide-react";
 import styles from "./OnboardingPage.module.css";
 
@@ -10,41 +9,29 @@ const SLIDES = [
   {
     icon: <LineChart size={48} />,
     title: "Acompanhe suas ações",
-    description: "Visualize o desempenho da sua carteira com gráficos interativos e métricas atualizadas em tempo real.",
+    description: "Visualize o desempenho da sua carteira com gráficos interativos e métricas atualizadas em tempo real."
   },
   {
     icon: <Wallet size={48} />,
     title: "Gerencie sua carteira",
-    description: "Cadastre suas ações, acompanhe preços de compra e venda, e tenha uma visão completa do seu patrimônio.",
+    description: "Cadastre suas ações, acompanhe preços de compra e venda, e tenha uma visão completa do seu patrimônio."
   },
   {
     icon: <FileBarChart size={48} />,
     title: "Exporte relatórios",
-    description: "Baixe seus dados em PDF, Excel ou CSV para análises offline e compartilhamento.",
-  },
+    description: "Baixe seus dados em PDF, Excel ou CSV para análises offline e compartilhamento."
+  }
 ];
 
 export function OnboardingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const { hasSeenOnboarding, markOnboardingAsSeen } = useOnboarding();
 
-  // Se o usuário já tiver visto, redireciona imediatamente
   useEffect(() => {
-    if (user?.id) {
-      const key = `atlascapital:onboarding_seen:${user.id}`;
-      if (localStorage.getItem(key) === "true") {
-        window.location.href = "/";
-      }
+    if (hasSeenOnboarding) {
+      window.location.href = "/";
     }
-  }, [user]);
-
-  const handleFinish = () => {
-    if (user?.id) {
-      localStorage.setItem(`atlascapital:onboarding_seen:${user.id}`, "true");
-    }
-    window.location.href = "/";
-  };
+  }, [hasSeenOnboarding]);
 
   const handleNext = () => {
     if (currentSlide < SLIDES.length - 1) {
@@ -54,11 +41,24 @@ export function OnboardingPage() {
     }
   };
 
+  const handleFinish = () => {
+    markOnboardingAsSeen();
+    window.location.href = "/";
+  };
+
   const handleSkip = () => {
     handleFinish();
   };
 
+  const handleDotClick = (index: number) => {
+    setCurrentSlide(index);
+  };
+
   const isLastSlide = currentSlide === SLIDES.length - 1;
+
+  if (hasSeenOnboarding) {
+    return null;
+  }
 
   return (
     <div className={styles.container}>
@@ -74,7 +74,7 @@ export function OnboardingPage() {
             <button
               key={index}
               className={`${styles.dot} ${currentSlide === index ? styles.dotActive : ""}`}
-              onClick={() => setCurrentSlide(index)}
+              onClick={() => handleDotClick(index)}
               aria-label={`Ir para slide ${index + 1}`}
             />
           ))}
