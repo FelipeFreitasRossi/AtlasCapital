@@ -5,22 +5,22 @@ const SESSION_KEY = 'atlascapital:session';
 const TOKEN_KEY = 'atlascapital:token';
 
 export const authService = {
-  async login(data: LoginInput): Promise<User> {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Erro ao fazer login.');
-    }
-    const result = await response.json();
-    console.log('[authService] Login response:', result);
-    localStorage.setItem(TOKEN_KEY, result.token);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(result.user));
-    return result.user;
-  },
+    async login(data: LoginInput): Promise<User> {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Erro ao fazer login.');
+      }
+      const result = await response.json();
+      console.log('Login response:', result); 
+      localStorage.setItem('atlascapital:token', result.token);
+      localStorage.setItem('atlascapital:session', JSON.stringify(result.user));
+      return result.user;
+    },
 
   async register(data: RegisterInput): Promise<User> {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
