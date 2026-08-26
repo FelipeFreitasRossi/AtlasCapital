@@ -20,33 +20,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const loadUser = async () => {
       try {
         const currentUser = await authService.getCurrentUser();
-        console.log('[AuthContext] Usuário carregado:', currentUser);
-        setUser(currentUser);
+        if (isMounted) {
+          setUser(currentUser);
+          console.log('[AuthContext] Usuário carregado:', currentUser);
+        }
       } catch (error) {
         console.error('[AuthContext] Erro ao carregar usuário:', error);
-        setUser(null);
+        if (isMounted) {
+          setUser(null);
+        }
       } finally {
-        setIsCheckingSession(false);
-        console.log('[AuthContext] Verificação concluída. Autenticado:', !!user);
+        if (isMounted) {
+          setIsCheckingSession(false);
+          console.log('[AuthContext] Verificação concluída. Autenticado:', !!user);
+        }
       }
     };
+
+    // Fallback de segurança: se depois de 5 segundos ainda estiver checando, força finalização
+    const timeout = setTimeout(() => {
+      if (isMounted && isCheckingSession) {
+        console.warn('[AuthContext] Fallback: forçando fim da verificação após 5s');
+        setIsCheckingSession(false);
+      }
+    }, 5000);
+
     loadUser();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
 
   const login = async (data: LoginInput) => {
-    console.log('[AuthContext] login chamado com:', data.email);
     const loggedUser = await authService.login(data);
-    console.log('[AuthContext] Usuário logado:', loggedUser);
     setUser(loggedUser);
   };
 
   const register = async (data: RegisterInput) => {
-    console.log('[AuthContext] register chamado com:', data.email);
     const newUser = await authService.register(data);
-    console.log('[AuthContext] Usuário registrado:', newUser);
     setUser(newUser);
   };
 
