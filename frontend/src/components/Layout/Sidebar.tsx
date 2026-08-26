@@ -57,7 +57,6 @@ export function Sidebar({
         className={`${styles.overlay} ${isOpen ? styles.overlayVisible : ""}`}
         onClick={onClose}
       />
-
       <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}>
         <div className={styles.brand}>
           <div className={styles.logo}>

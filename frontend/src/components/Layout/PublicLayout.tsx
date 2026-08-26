@@ -1,3 +1,5 @@
+// frontend/src/components/Layout/PublicLayout.tsx
+
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
@@ -16,17 +18,14 @@ export function PublicLayout() {
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         onAddStock={() => {}}
-        showAddButton={false}
-        showUser={false}
+        showAddButton={false} // Oculta botão "Nova Ação"
+        showUser={false}      // Oculta bloco do usuário
       />
-
       <div className={styles.mainColumn}>
         <TopBar onOpenMenu={() => setIsMenuOpen(true)} />
-
         <main className={styles.content}>
           <Outlet />
         </main>
-
         <Footer />
       </div>
     </div>

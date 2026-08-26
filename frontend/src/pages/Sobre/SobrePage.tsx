@@ -10,9 +10,9 @@ import {
   TrendingUp,
   Layers,
   Code2,
+  FolderGit2, // ✅ Substituído por FolderGit2 (ícone de repositório)
 } from "lucide-react";
 import styles from "./SobrePage.module.css";
-import { FolderGit2 } from "lucide-react";
 
 export function SobrePage() {
   return (

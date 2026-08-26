@@ -1,11 +1,13 @@
 // frontend/src/App.tsx
 
 import { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { SplashScreen } from "./components/SplashScreen/SplashScreen";
 import { AppShell } from "./components/Layout/AppShell";
+import { PublicLayout } from "./components/Layout/PublicLayout";
 import { StockForm } from "./components/StockForm/StockForm";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
+import { OnboardingGate } from "./components/Auth/OnboardingGate"; // ✅ CORRIGIDO (nome correto)
 import { DashboardPage } from "./pages/DashboardPage";
 import { WalletPage } from "./pages/WalletPage";
 import { ReportsPage } from "./pages/ReportsPage";
@@ -23,32 +25,6 @@ import { useAuth } from "./context/AuthContext";
 import { pushToast } from "./components/Toast/toastStore";
 import { checkAlerts } from "./services/aiService";
 import type { StockWithMetrics } from "./types/stock";
-
-// Componente que verifica se o onboarding já foi visto
-function OnboardingGuard({ children }: { children: JSX.Element }) {
-  const { user, isAuthenticated } = useAuth();
-  const [hasSeen, setHasSeen] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (isAuthenticated && user?.id) {
-      const key = `atlascapital:onboarding_seen:${user.id}`;
-      const seen = localStorage.getItem(key) === "true";
-      setHasSeen(seen);
-    } else {
-      setHasSeen(null);
-    }
-  }, [isAuthenticated, user]);
-
-  if (hasSeen === null) {
-    return <div style={{ textAlign: "center", padding: "40px" }}>Verificando...</div>;
-  }
-
-  if (!hasSeen) {
-    return <Navigate to="/onboarding" replace />;
-  }
-
-  return children;
-}
 
 function App() {
   const { stocks, totals, isLoading, error, saveStock, removeStock, refreshPrices } = useStocks();
@@ -72,15 +48,9 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [editingStock, setEditingStock] = useState<StockWithMetrics | null | undefined>(undefined);
 
-  function openCreateForm() {
-    setEditingStock(null);
-  }
-  function openEditForm(stock: StockWithMetrics) {
-    setEditingStock(stock);
-  }
-  function closeForm() {
-    setEditingStock(undefined);
-  }
+  function openCreateForm() { setEditingStock(null); }
+  function openEditForm(stock: StockWithMetrics) { setEditingStock(stock); }
+  function closeForm() { setEditingStock(undefined); }
 
   async function handleFormSubmit(data: Parameters<typeof saveStock>[0]) {
     const isEditing = Boolean(editingStock?.id);
@@ -94,13 +64,13 @@ function App() {
   }
 
   async function handleDelete(stock: StockWithMetrics) {
-    const confirmed = window.confirm(`Apagar a ação ${stock.ticker}?`);
+    const confirmed = window.confirm(`Apagar a ação ${stock.ticker}? Essa ação não pode ser desfeita.`);
     if (confirmed) {
       try {
         await removeStock(stock.id);
         pushToast(`${stock.ticker} removida da carteira.`, "info");
       } catch {
-        pushToast("Não foi possível apagar a ação.", "error");
+        pushToast("Não foi possível apagar a ação. Tente novamente.", "error");
       }
     }
   }
@@ -117,21 +87,23 @@ function App() {
   return (
     <>
       <Routes>
-        {/* Rotas públicas */}
+        {/* Rotas públicas sem header/footer (login/cadastro) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/cadastro" element={<RegisterPage />} />
-        <Route path="/sobre" element={<SobrePage />} />
-        <Route path="/documentacao" element={<DocumentacaoPage />} />
 
-        {/* Rotas protegidas */}
+        {/* Rotas públicas COM header e footer (Sobre e Documentação) */}
+        <Route element={<PublicLayout />}>
+          <Route path="/sobre" element={<SobrePage />} />
+          <Route path="/documentacao" element={<DocumentacaoPage />} />
+        </Route>
+
+        {/* Rotas protegidas (exigem login) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/onboarding" element={<OnboardingPage />} />
-
-          {/* Aplica o guard de onboarding nas rotas principais */}
-          <Route
-            element={
-              <OnboardingGuard>
+          <Route element={<OnboardingGate />}>
+            <Route
+              element={
                 <AppShell
                   context={{
                     stocks,
@@ -144,15 +116,15 @@ function App() {
                     refreshPrices,
                   }}
                 />
-              </OnboardingGuard>
-            }
-          >
-            <Route index element={<DashboardPage />} />
-            <Route path="carteira" element={<WalletPage />} />
-            <Route path="previsao" element={<ForecastPage />} />
-            <Route path="simulacao" element={<SimulationPage />} />
-            <Route path="alertas" element={<AlertsPage />} />
-            <Route path="relatorios" element={<ReportsPage />} />
+              }
+            >
+              <Route index element={<DashboardPage />} />
+              <Route path="carteira" element={<WalletPage />} />
+              <Route path="previsao" element={<ForecastPage />} />
+              <Route path="simulacao" element={<SimulationPage />} />
+              <Route path="alertas" element={<AlertsPage />} />
+              <Route path="relatorios" element={<ReportsPage />} />
+            </Route>
           </Route>
         </Route>
       </Routes>
