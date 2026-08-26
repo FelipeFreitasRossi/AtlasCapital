@@ -21,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let isMounted = true;
+
     const loadUser = async () => {
       try {
         const currentUser = await authService.getCurrentUser();
