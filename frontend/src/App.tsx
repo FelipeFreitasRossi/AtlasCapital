@@ -7,7 +7,7 @@ import { AppShell } from "./components/Layout/AppShell";
 import { PublicLayout } from "./components/Layout/PublicLayout";
 import { StockForm } from "./components/StockForm/StockForm";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
-import { OnboardingGate } from "./components/Auth/OnboardingGate"; // ✅ CORRIGIDO (nome correto)
+import { OnboardingGate } from "./components/Auth/OnboardingGate";
 import { DashboardPage } from "./pages/DashboardPage";
 import { WalletPage } from "./pages/WalletPage";
 import { ReportsPage } from "./pages/ReportsPage";
@@ -30,6 +30,10 @@ function App() {
   const { stocks, totals, isLoading, error, saveStock, removeStock, refreshPrices } = useStocks();
   const { isAuthenticated, isCheckingSession } = useAuth();
 
+  // LOGS PARA DEPURAÇÃO
+  console.log('[App] isLoading:', isLoading, 'isCheckingSession:', isCheckingSession);
+
+  // Verificação periódica de alertas
   useEffect(() => {
     if (!isAuthenticated || stocks.length === 0) return;
     const interval = setInterval(async () => {
@@ -46,6 +50,16 @@ function App() {
   }, [isAuthenticated, stocks, totals.currentValue]);
 
   const [showSplash, setShowSplash] = useState(true);
+
+  // FALLBACK: força saída da SplashScreen após 5 segundos (mesmo se os dados não carregarem)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      console.warn('[App] Fallback: forçando saída da SplashScreen após 5s');
+      setShowSplash(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const [editingStock, setEditingStock] = useState<StockWithMetrics | null | undefined>(undefined);
 
   function openCreateForm() { setEditingStock(null); }
@@ -75,30 +89,32 @@ function App() {
     }
   }
 
+  // Se a SplashScreen ainda estiver visível, renderiza ela
   if (showSplash) {
     return (
       <SplashScreen
         isDataLoaded={!isLoading && !isCheckingSession}
-        onFinished={() => setShowSplash(false)}
+        onFinished={() => {
+          console.log('[App] SplashScreen finalizada');
+          setShowSplash(false);
+        }}
       />
     );
   }
 
+  // Se a SplashScreen já foi finalizada, renderiza o app normalmente
   return (
     <>
       <Routes>
-        {/* Rotas públicas sem header/footer (login/cadastro) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/cadastro" element={<RegisterPage />} />
 
-        {/* Rotas públicas COM header e footer (Sobre e Documentação) */}
         <Route element={<PublicLayout />}>
           <Route path="/sobre" element={<SobrePage />} />
           <Route path="/documentacao" element={<DocumentacaoPage />} />
         </Route>
 
-        {/* Rotas protegidas (exigem login) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route element={<OnboardingGate />}>
