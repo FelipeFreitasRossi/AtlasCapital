@@ -26,11 +26,12 @@ import { pushToast } from "./components/Toast/toastStore";
 import { checkAlerts } from "./services/aiService";
 import type { StockWithMetrics } from "./types/stock";
 
+const SPLASH_SEEN_KEY = "atlascapital:splash_seen";
+
 function App() {
   const { stocks, totals, isLoading, error, saveStock, removeStock, refreshPrices } = useStocks();
   const { isAuthenticated, isCheckingSession } = useAuth();
 
-  // LOGS PARA DEPURAÇÃO
   console.log('[App] isLoading:', isLoading, 'isCheckingSession:', isCheckingSession);
 
   // Verificação periódica de alertas
@@ -49,7 +50,16 @@ function App() {
     return () => clearInterval(interval);
   }, [isAuthenticated, stocks, totals.currentValue]);
 
-  const [showSplash, setShowSplash] = useState(true);
+  // Recupera do sessionStorage se a Splash já foi exibida
+  const [splashSeen] = useState(() => sessionStorage.getItem(SPLASH_SEEN_KEY) === "true");
+  const [showSplash, setShowSplash] = useState(!splashSeen);
+
+  // Quando a Splash terminar, marca como vista e guarda no sessionStorage
+  const handleSplashFinish = () => {
+    sessionStorage.setItem(SPLASH_SEEN_KEY, "true");
+    setShowSplash(false);
+  };
+
   const [editingStock, setEditingStock] = useState<StockWithMetrics | null | undefined>(undefined);
 
   function openCreateForm() { setEditingStock(null); }
@@ -79,20 +89,17 @@ function App() {
     }
   }
 
-  // Se a SplashScreen ainda estiver visível, renderiza ela
+  // Se a SplashScreen ainda não foi vista, renderiza ela
   if (showSplash) {
     return (
       <SplashScreen
         isDataLoaded={!isLoading && !isCheckingSession}
-        onFinished={() => {
-          console.log('[App] SplashScreen finalizada');
-          setShowSplash(false);
-        }}
+        onFinished={handleSplashFinish}
       />
     );
   }
 
-  // Se a SplashScreen já foi finalizada, renderiza o app normalmente
+  // Se já foi vista, renderiza o app normalmente
   return (
     <>
       <Routes>
