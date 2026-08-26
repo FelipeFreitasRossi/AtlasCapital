@@ -50,16 +50,6 @@ function App() {
   }, [isAuthenticated, stocks, totals.currentValue]);
 
   const [showSplash, setShowSplash] = useState(true);
-
-  // FALLBACK: força saída da SplashScreen após 5 segundos (mesmo se os dados não carregarem)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      console.warn('[App] Fallback: forçando saída da SplashScreen após 5s');
-      setShowSplash(false);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, []);
-
   const [editingStock, setEditingStock] = useState<StockWithMetrics | null | undefined>(undefined);
 
   function openCreateForm() { setEditingStock(null); }
